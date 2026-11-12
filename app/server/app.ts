@@ -14,6 +14,7 @@ import {
 } from "./store.js";
 import { sheetConfigured, syncFromSheet, pushLeadToSheet, bridgeToday, bridgeAct } from "./sheet.js";
 import { counters, todayQueue, scoutRows, ledger, chainKey, workday } from "./queries.js";
+import { registerLive } from "./live.js";
 import { todayYmd } from "../shared/dates.js";
 import { campaignIdFor, newEventId, sha256Hex, variantFor } from "../shared/hash.js";
 import { EVENT_KINDS, type Campaign, type EventKind, type LedgerEvent } from "../shared/types.js";
@@ -31,6 +32,7 @@ function asyncRoute(fn: (req: Request, res: Response) => Promise<unknown>) {
 export function createApp() {
   const app = express();
   app.use(express.json({ limit: "256kb" }));
+  registerLive(app);
 
   // Block any mutation verb on events, explicitly, so the ledger is append-only by construction.
   app.all(["/api/events", "/api/events/*"], (req, res, next) => {

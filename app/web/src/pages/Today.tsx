@@ -1,3 +1,4 @@
+import { useLive } from "../lib/live";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, fmtWeekdayDate, newIdempotencyKey, type TodayCard, type TodayResponse } from "../lib/api";
@@ -23,6 +24,7 @@ export default function Today() {
     load().catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active?.id]);
+  useLive(load);
 
   async function copyBody(card: TodayCard) {
     try {

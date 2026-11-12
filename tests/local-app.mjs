@@ -107,6 +107,33 @@ try {
   today = await get(`/api/today?campaign=${cid}`);
   check("undone lead is back in today's queue at step 1", today.cards.some((c) => c.name === "Ada" && c.step === 1), today.cards.map((c) => [c.name, c.step]));
 
+  // 6b. live updates: a write into the data folder (an agent on the same machine) is pushed to the browser
+  {
+    const ctl = new AbortController();
+    const res = await fetch(base + "/api/changes", { signal: ctl.signal });
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    let pendingRead = null;
+    const waitEvent = async (name, ms) => {
+      const t0 = Date.now();
+      while (Date.now() - t0 < ms) {
+        if (buf.includes("event: " + name)) return true;
+        if (!pendingRead) pendingRead = reader.read().then((r) => { pendingRead = null; if (r.value) buf += dec.decode(r.value); });
+        await Promise.race([pendingRead, new Promise((r) => setTimeout(r, 400))]);
+      }
+      return false;
+    };
+    check("live stream says hello", await waitEvent("hello", 4000));
+    buf = "";
+    await new Promise((r) => setTimeout(r, 1200));
+    const cur = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8"));
+    writeFileSync(join(DATA, "leads.json"), JSON.stringify([...cur, mk("Cy", "cy0000000003")], null, 2));
+    check("a data-folder write is pushed as a change event (no refresh button needed)", await waitEvent("change", 6000), buf);
+    ctl.abort();
+    writeFileSync(join(DATA, "leads.json"), JSON.stringify(cur, null, 2));
+  }
+
   // 7. mark sent again, then restart the server: state must survive
   const s3 = await post("/api/events", { campaign_id: cid, lead_id: ada.lead_id, kind: "sent", step: 1, body_text: ada.body, idempotency_key: "t-sent-ada-2" });
   check("re-send after undo is recorded", s3.status === 201, s3);

@@ -59,11 +59,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             <span className="flex flex-col leading-tight">God’s L’Eye<span className="text-[10px] font-semibold opacity-70">GenTeam (Genspark) Edition</span></span>
           </Link>
 
-          {value.refresh && (
-            <button className="flex w-full items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold hover:bg-white/15" onClick={value.refresh}>
-              ↻ Refresh
-            </button>
-          )}
+          <p className="flex items-center gap-2 px-1 text-xs text-brand-on-navy opacity-70"><span className="h-2 w-2 rounded-full bg-green-400" aria-hidden />Updates automatically</p>
           {value.sync && (
             <button disabled={value.syncing} className="flex w-full items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold hover:bg-white/15 disabled:opacity-60" onClick={value.sync}>
               {value.syncing ? "Syncing sheet…" : "⇅ Sync sheet"}

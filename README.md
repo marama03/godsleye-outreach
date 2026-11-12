@@ -59,7 +59,7 @@ Each one is a decision, not a gap. `docs/godsleye-start-here.md`, section 4, say
   part of the setup, and a sheet wired to it must not also be swept by the Tracker: two writers on one
   row is the one thing this design refuses. Section 6 of the manual explains when it is worth having.
 - `app/` — the dashboard: Today, the row cards, the send and undo path.
-- `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). `node tests/local-app.mjs` runs 20 checks on the dashboard's local store (needs `npm install` in `app/`): sent, skip, undo, double-click and restart, with no sheet or token. None of the three touches a real sheet; none of them needs a Google credential.
+- `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). `node tests/local-app.mjs` runs 22 checks on the dashboard's local store (needs `npm install` in `app/`): sent, skip, undo, double-click and restart, with no sheet or token. None of the three touches a real sheet; none of them needs a Google credential.
 
 ## Status
 

@@ -1,3 +1,4 @@
+import { useLive } from "../lib/live";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, newIdempotencyKey, type ScoutRow } from "../lib/api";
@@ -44,6 +45,7 @@ export default function Scout() {
     load().catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active?.id]);
+  useLive(load);
 
   async function act(lead: ScoutRow, kind: "invite_sent" | "accepted") {
     if (!active) return;

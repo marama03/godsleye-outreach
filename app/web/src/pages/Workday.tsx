@@ -1,5 +1,6 @@
 // The one-screen Today, laid out like God's L'Eye: big title, two stat tiles, a live sync line,
 // then folding sections. Sending on LinkedIn stays manual; every button here only records it.
+import { useLive } from "../lib/live";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { api, fmtWeekdayDate, newIdempotencyKey, type PersonRow, type SheetDueRow, type TodayCard, type WorkdayResponse } from "../lib/api";
@@ -74,6 +75,9 @@ export default function Workday() {
     if (sheetOn) loadSheet();
   }, [sheetOn, loadSheet]);
 
+  // the screen follows the data folder; there is no refresh button
+  useLive(() => { load(); if (sheetOn) loadSheet(); });
+
   const sync = useCallback(async () => {
     if (!active) return;
     side.set({ syncing: true });
@@ -103,7 +107,6 @@ export default function Workday() {
         { id: "invite", label: "New people to invite", count: data.to_invite.length },
       ],
       meter: { used: data.invited_today, cap: data.daily_cap },
-      refresh: () => { load().then(() => toast.show({ text: "Refreshed", ttlMs: 1200 })).catch(() => undefined); },
       sync: sheetOn ? sync : null,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

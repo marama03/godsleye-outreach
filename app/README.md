@@ -21,6 +21,8 @@ npm run dev                       # server on :8787 + web on :5173 (open http://
 npm run build                     # builds web/dist; then `npm start` serves it from the API on :8787
 ```
 
+There is no refresh button. The screen follows the `data/` folder: when an agent writes a lead or a dossier, or you click in another tab, every open screen updates by itself within a second or two (`GET /api/changes`, a server-sent-event stream that only watches file times).
+
 If port 8787 is taken on your machine: `PORT=8788 npm run dev` — the web proxy follows `PORT`.
 
 ## The five screens

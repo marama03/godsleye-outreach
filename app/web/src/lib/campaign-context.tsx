@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Campaign } from "../../../shared/types";
 import { api } from "./api";
+import { useLive } from "./live";
 
 interface Ctx {
   campaigns: Campaign[];
@@ -30,6 +31,8 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     refresh().catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useLive(refresh);
 
   const setActiveId = (id: string) => {
     setActiveIdState(id);
