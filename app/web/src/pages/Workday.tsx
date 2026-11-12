@@ -42,7 +42,8 @@ export default function Workday() {
   const [leaving, setLeaving] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<string | null>(null);
   const [sheetOn, setSheetOn] = useState(false);
-  const [syncedAt, setSyncedAt] = useState<Date | null>(null);
+  const [syncedAt, setSyncedAt] = useState<Date | null>(null);
+  const actLock = useRef(0);
   const keys = useRef(new Map<string, string>());
   const [busy, setBusy] = useState<Set<string>>(new Set());
   const [last, setLast] = useState<{ label: string; name: string; contact_id: string; stage_after: string } | null>(null);
@@ -128,8 +129,10 @@ export default function Workday() {
   }, [data, sheetOn, sync, sheetRows]);
   useEffect(() => () => side.set({ sections: [], meter: null, refresh: null, sync: null }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function post(lead_id: string, kind: "invite_sent" | "accepted" | "withdrawn" | CardExit, step?: number, body?: string, doneText?: string, payload?: Record<string, unknown>) {
+  async function post(lead_id: string, kind: "invite_sent" | "accepted" | "withdrawn" | CardExit, step?: number, body?: string, doneText?: string, payload?: Record<string, unknown>, lock = true) {
     if (!active) return;
+    // A second tap right after the first lands on whoever slid up into that spot. Ignore taps for a moment after each action.
+    if (lock) { if (Date.now() < actLock.current) return; actLock.current = Date.now() + 1100; }
     const k = `${lead_id}:${step ?? 0}:${kind}${payload?.booked ? ":booked" : ""}`;
     if (!keys.current.has(k)) keys.current.set(k, newIdempotencyKey());
     try {
@@ -409,14 +412,14 @@ export default function Workday() {
           </Section>
 
           {data.stale_invites.length > 0 && (
-            <Section id="stale" title="Invites waiting 90+ days" count={data.stale_invites.length}>
+            <Section id="stale" title="Never accepted (90+ days)" count={data.stale_invites.length}>
               <div className="card p-4">
-                <p className="mb-2 text-sm text-brand-muted">These never accepted. Withdraw each on LinkedIn (Manage invitations → Sent), then tell the dashboard so it stops tracking them.</p>
-                <button className="btn-secondary mb-2" onClick={async () => { for (const p of data.stale_invites) await post(p.lead_id, "withdrawn", undefined, undefined, `Withdrawn · ${p.name}`); }}>I withdrew all {data.stale_invites.length}</button>
+                <p className="mb-2 text-sm text-brand-muted">These invites were never accepted after 90 days. Drop them so they stop counting as waiting.</p>
+                <button className="btn-secondary mb-2" onClick={async () => { for (const p of data.stale_invites) await post(p.lead_id, "withdrawn", undefined, undefined, `Dropped · ${p.name}`, undefined, false); }}>Drop all {data.stale_invites.length}</button>
                 {data.stale_invites.map((p) => personRow(p, (
                   <>
                     {profile(p)}
-                    <button className="btn-primary" onClick={() => post(p.lead_id, "withdrawn", undefined, undefined, `Withdrawn · ${p.name}`)}>I withdrew it</button>
+                    <button className="btn-primary" onClick={() => post(p.lead_id, "withdrawn", undefined, undefined, `Dropped · ${p.name}`)}>Drop</button>
                   </>
                 ), `invited ${p.days_invited} days ago`))}
               </div>

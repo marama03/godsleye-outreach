@@ -13,7 +13,7 @@ import Ledger from "./pages/Ledger";
 function Home() {
   const { active, campaigns, loaded } = useCampaign();
   if (!loaded) return <p className="p-6 text-brand-muted">Loading…</p>;
-  if (campaigns.length === 0) return <Navigate to="/campaigns" replace />;
+  if (campaigns.length === 0) return <Navigate to="/today" replace />;
   if (active) return <Navigate to="/today" replace />;
   return null;
 }

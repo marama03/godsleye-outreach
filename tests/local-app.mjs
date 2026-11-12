@@ -238,6 +238,7 @@ try {
     await refused("sent on a never-invited lead is refused", await ev("r_found", "sent", { step: 1 }));
     await refused("skipped step 7 on a fresh lead is refused", await ev("r_found", "skipped", { step: 7 }));
     await refused("a reply from a never-invited lead is refused", await ev("r_found", "replied"));
+    await refused("accepting a never-invited lead is refused", await ev("r_found", "accepted"));
     await refused("withdrawing a never-invited lead is refused", await ev("r_found", "withdrawn"));
     await refused("an answer with no reply waiting is refused", await ev("r_acc", "sent", { payload: { answered: true } }));
     await refused("sent on an invited-but-not-accepted lead is refused", await ev("r_inv", "sent", { step: 1 }));

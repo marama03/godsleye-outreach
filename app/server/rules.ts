@@ -20,6 +20,7 @@ export function refuseReason(lead: Lead, chain: Chain, allEventsForLead: LedgerE
   }
   if (kind === "accepted") {
     if (withdrawn) return "this invitation was withdrawn; it cannot be accepted";
+    if (!invited) return "this person was never invited, so there is no invitation to accept; log the invitation first";
     return null;
   }
   if (kind === "sent" || kind === "skipped") {

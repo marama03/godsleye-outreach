@@ -31,11 +31,11 @@ async function answering() {
   try { const r = await fetch(`http://127.0.0.1:${PORT}/api/health`, { signal: AbortSignal.timeout(3000) }); return r.ok; } catch { return false; }
 }
 
-if (!existsSync(join(APP, "node_modules"))) { console.error("Run `npm install` in app/ first."); process.exit(1); }
 if (!existsSync(join(APP, "web", "dist"))) say("Note: app/web/dist is missing. Run `npm run build` in app/ so the phone gets the built dashboard.");
 
 const logDir = join(os.homedir(), ".godsleye"); mkdirSync(logDir, { recursive: true });
 const log = join(logDir, "dashboard.log");
+if (!has("status") && !has("off") && !existsSync(join(APP, "node_modules"))) { console.error("Run `npm install` in app/ first."); process.exit(1); }
 
 if (isWin) {
   const ps = (s) => run("powershell", ["-NoProfile", "-NonInteractive", "-Command", s]);

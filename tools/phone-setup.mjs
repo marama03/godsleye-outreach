@@ -74,6 +74,7 @@ let js = null;
 try { js = JSON.parse(st.out); } catch {}
 if (!js || js.BackendState !== "Running") {
   say(`Tailscale is not signed in (state: ${js?.BackendState ?? "unknown"}).`);
+  if (has("check")) fail(5, `Tailscale is not signed in (state: ${js?.BackendState ?? "unknown"}). Run phone-setup without --check to start the sign-in.`);
   const up = run(TS, ["up", "--timeout=5s"]);
   const url = (up.out.match(/https:\/\/login\.tailscale\.com\/\S+/) ?? [])[0];
   fail(5, url ? `Open this link and sign in, then re-run this command:\n${url}` : "Open the Tailscale app, sign in, then re-run this command.");
