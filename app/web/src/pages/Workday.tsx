@@ -42,7 +42,8 @@ export default function Workday() {
   const [leaving, setLeaving] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<string | null>(null);
   const [sheetOn, setSheetOn] = useState(false);
-  const [syncedAt, setSyncedAt] = useState<Date | null>(null);
+  const [syncedAt, setSyncedAt] = useState<Date | null>(null);
+
   const actLock = useRef(0);
   const keys = useRef(new Map<string, string>());
   const [busy, setBusy] = useState<Set<string>>(new Set());
@@ -404,7 +405,7 @@ export default function Workday() {
                   <>
                     {profile(p)}
                     <button className="btn-primary" onClick={() => post(p.lead_id, "accepted", undefined, undefined, `Accepted · ${p.name} goes to research`)}>Accepted</button>
-                    <button className="btn-ghost" onClick={() => post(p.lead_id, "not_a_fit", undefined, undefined, `Marked not a fit · ${p.name}`)}>Drop</button>
+                    <button className="btn-ghost" onClick={() => post(p.lead_id, "not_a_fit", undefined, undefined, `Marked not a fit · ${p.name}`)}>Not a fit</button>
                   </>
                 ), p.invited_at ? `invited ${fmtWeekdayDate(p.invited_at.slice(0, 10))}` : undefined))}
               </div>
@@ -412,14 +413,14 @@ export default function Workday() {
           </Section>
 
           {data.stale_invites.length > 0 && (
-            <Section id="stale" title="Never accepted (90+ days)" count={data.stale_invites.length}>
+            <Section id="stale" title="Invites never accepted (90+ days)" count={data.stale_invites.length}>
               <div className="card p-4">
-                <p className="mb-2 text-sm text-brand-muted">These invites were never accepted after 90 days. Drop them so they stop counting as waiting.</p>
-                <button className="btn-secondary mb-2" onClick={async () => { for (const p of data.stale_invites) await post(p.lead_id, "withdrawn", undefined, undefined, `Dropped · ${p.name}`, undefined, false); }}>Clear all {data.stale_invites.length}</button>
+                <p className="mb-2 text-sm text-brand-muted">These invites sat unaccepted for 90+ days. These were never accepted after three months. Withdraw them on LinkedIn, then mark each one here so it stops counting as waiting. This dashboard cannot withdraw anything itself.</p>
+                <a className="btn-primary mb-2 mr-2 inline-block" href="https://www.linkedin.com/mynetwork/invitation-manager/sent/" target="_blank" rel="noreferrer">Open sent invites on LinkedIn</a>
                 {data.stale_invites.map((p) => personRow(p, (
                   <>
                     {profile(p)}
-                    <button className="btn-primary" onClick={() => post(p.lead_id, "withdrawn", undefined, undefined, `Dropped · ${p.name}`)}>Drop</button>
+                    <button className="btn-primary" onClick={() => post(p.lead_id, "withdrawn", undefined, undefined, `Marked withdrawn · ${p.name}`)}>Mark withdrawn</button>
                   </>
                 ), `invited ${p.days_invited} days ago`))}
               </div>

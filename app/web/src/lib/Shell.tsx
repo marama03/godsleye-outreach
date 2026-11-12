@@ -90,10 +90,12 @@ export default function Shell({ children }: { children: ReactNode }) {
 
           {value.meter && (
             <div className={`rounded-xl bg-white/10 px-3 py-2.5 text-xs text-white/75 ${hide}`}>
-              Invites today <b style={{ color: theme.highlight }}>{value.meter.used} of {value.meter.cap}</b>
-              <div className="my-1.5 h-1.5 rounded-full bg-white/15">
-                <i className="block h-full rounded-full" style={{ width: `${pct}%`, background: theme.highlight }} />
-              </div>
+              Invites today <b style={{ color: theme.highlight }}>{value.meter.used}{value.meter.cap > 0 ? ` · target ${value.meter.cap}` : ""}</b>
+              {value.meter.cap > 0 ? (
+                <div className="my-1.5 h-1.5 rounded-full bg-white/15">
+                  <i className="block h-full rounded-full" style={{ width: `${pct}%`, background: theme.highlight }} />
+                </div>
+              ) : <div className="my-1.5" />}
               Send invites by hand; log each one here.
             </div>
           )}

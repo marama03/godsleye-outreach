@@ -137,8 +137,8 @@ export function todayQueue(db: Db, c: Campaign, today: string): TodayResult {
       return a.state.next_due_date!.localeCompare(b.state.next_due_date!); // older due first
     });
 
-  // R8 daily cap: oldest days_since_touch first, overflow rolls to next weekday.
-  const capped = due.slice(0, Math.max(0, c.daily_cap));
+  // The daily number is a target, not a limit: everyone due is shown, oldest first.
+  const capped = due;
   const overflow_count = due.length - capped.length;
 
   const cards: TodayCard[] = capped.map((r) => {

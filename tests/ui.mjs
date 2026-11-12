@@ -67,7 +67,7 @@ try {
     await sleep(2500);
   }
   const t1 = await txt();
-  check("demo shows waiting-on-you, messages due, 90+ days and invite sections", /They replied, waiting on you/.test(t1) && /Messages due/.test(t1) && /Never accepted \(90\+ days\)/.test(t1) && /New people to invite/.test(t1));
+  check("demo shows waiting-on-you, messages due, 90+ days and invite sections", /They replied, waiting on you/.test(t1) && /Messages due/.test(t1) && /Invites never accepted \(90\+ days\)/.test(t1) && /New people to invite/.test(t1));
   await shot("suite-demo.png");
 
   {
@@ -143,14 +143,14 @@ try {
   check("Accepted on a pending invite", await clickIn(`document.querySelector('#sec-accept')`, "Accepted"));
   await sleep(2600);
   check("Accepted moves it out of Did they accept?", (await accRows()) === acc0 - 1, [acc0, await accRows()]);
-  check("Drop on a pending invite", await clickIn(`document.querySelector('#sec-accept')`, "Drop"));
+  check("Not a fit on a pending invite", await clickIn(`document.querySelector('#sec-accept')`, "Not a fit"));
   await sleep(2600);
-  check("two invites are listed under 90+ days", /Never accepted \(90\+ days\)\s*2/.test(await txt()));
-  check("Drop on one 90+ day invite", await clickIn(`document.querySelector('#sec-stale')`, "Drop"));
+  check("two invites are listed under 90+ days", /Invites never accepted \(90\+ days\)\s*2/.test(await txt()));
+  check("Mark withdrawn on one 90+ day invite", await clickIn(`document.querySelector('#sec-stale')`, "Mark withdrawn"));
   await sleep(2600);
-  check("one 90+ day invite is left", /Never accepted \(90\+ days\)\s*1/.test(await txt()));
+  check("one 90+ day invite is left", /Invites never accepted \(90\+ days\)\s*1/.test(await txt()));
   await sleep(2600);
-  check("Clear all clears the rest", await clickIn(`document.querySelector('#sec-stale')`, "Clear all"));
+  check("Mark withdrawn on the last 90+ day invite", await clickIn(`document.querySelector('#sec-stale')`, "Mark withdrawn"));
   await sleep(2600);
   check("90+ day section is gone once withdrawn", !(await ev(`!!document.querySelector('#sec-stale')`)));
   check("I invited on LinkedIn on a new prospect", await clickIn(`document.querySelector('#sec-invite')`, "I invited on LinkedIn"));

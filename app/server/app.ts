@@ -107,7 +107,7 @@ export function createApp() {
     if (!name) return bad(res, "name required");
     if (!icp_sentence || icp_sentence.length > 200) return bad(res, "icp_sentence required, max 200 chars");
     if (!chain_id || !Number.isInteger(chain_version)) return bad(res, "chain_id and chain_version required");
-    if (!Number.isInteger(daily_cap) || daily_cap < 1) return bad(res, "daily_cap must be a positive integer");
+    if (!Number.isInteger(daily_cap) || daily_cap < 0) return bad(res, "daily_cap must be 0 (no target) or a positive integer");
     if (!DATE_RE.test(start_date)) return bad(res, "start_date must be YYYY-MM-DD");
 
     const out = await withLock(async () => {
@@ -147,6 +147,22 @@ export function createApp() {
       return { campaign, event: evt };
     });
     res.status(201).json(out);
+  }));
+
+  // Change the daily invite target. 0 means no target. It is a goal shown in the sidebar, never a limit.
+  app.post("/api/campaigns/:id/target", asyncRoute(async (req, res) => {
+    const id = String(req.params.id);
+    const target = Number(req.body?.daily_cap);
+    if (!Number.isInteger(target) || target < 0 || target > 1000) return bad(res, "target must be 0 (no target) or a whole number up to 1000");
+    const out = await withLock(async () => {
+      const db = await loadDb();
+      const c = db.campaigns.find((x) => x.id === id);
+      if (!c) return { status: 404, body: { error: "campaign not found" } };
+      c.daily_cap = target;
+      await saveCampaigns(db.campaigns);
+      return { status: 200, body: { ok: true, daily_cap: target } };
+    });
+    res.status(out.status).json(out.body);
   }));
 
   // Delete a campaign with everything in it (its leads and events). A copy is kept in data/deleted/ so it can be restored.

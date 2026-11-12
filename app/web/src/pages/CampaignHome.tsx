@@ -3,6 +3,19 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { api, type CampaignResponse, fmtWeekdayDate } from "../lib/api";
 import { useCampaign } from "../lib/campaign-context";
 
+function TargetEditor({ id, value }: { id: string; value: number }) {
+  const { refresh } = useCampaign();
+  const [v, setV] = useState(String(value));
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <input aria-label="Daily invite target" type="number" min={0} className="input w-20" value={v} onChange={(e) => { setV(e.target.value); setMsg(null); }} />
+      <button className="btn-secondary" disabled={String(value) === v} onClick={async () => { try { await api.setTarget(id, Number(v)); await refresh(); setMsg("Saved"); } catch (e: any) { setMsg(e.message ?? "Could not save"); } }}>Save</button>
+      <span className="text-xs text-brand-muted">{msg ?? (value === 0 ? "no target" : "a goal, never a limit")}</span>
+    </span>
+  );
+}
+
 function Counter({ label, value, to }: { label: string; value: number; to?: string }) {
   const inner = (
     <div className="card flex flex-col items-start p-5">
@@ -104,7 +117,7 @@ export default function CampaignHome() {
             <dl className="mt-4 grid grid-cols-1 gap-y-2 text-sm sm:grid-cols-3 sm:gap-x-8">
               <div><dt className="label">Chain</dt><dd className="font-mono">{data.chain_key}</dd></div>
               <div><dt className="label">Start date</dt><dd>{fmtWeekdayDate(c.start_date)}</dd></div>
-              <div><dt className="label">Daily cap</dt><dd>{c.daily_cap} cards</dd></div>
+              <div><dt className="label">Daily invite target</dt><dd><TargetEditor id={c.id} value={c.daily_cap} /></dd></div>
             </dl>
           </div>
           <div className="w-full min-w-0 sm:w-auto sm:max-w-[16rem] sm:shrink-0 sm:text-right">

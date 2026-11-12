@@ -80,7 +80,7 @@ is picked automatically by luminance so a pasted palette stays readable.
 | R5 every card has an exit | `web/src/pages/Today.tsx` — four buttons, always. Skip is an event, not a filter. |
 | R6 nothing derived is stored | `server/queries.ts` recomputes stage/step/due/counters per request; `tests/local-app.mjs` exercises it end to end. |
 | R7 do-not-contact hard stop | `server/queries.ts` → `todayQueue` filters it first; `deriveLeadState.eligible` is false. |
-| R8 daily cap | `todayQueue` slices to `daily_cap`, oldest `days_since_touch` first; overflow reports the next weekday. |
+| R8 daily target | `daily_cap` is a target, never a limit: `todayQueue` lists everyone due, oldest `days_since_touch` first. `0` means no target. |
 | R9 reply stops the sequence | `eligible=false` once a live `replied` exists; lead moves to the "Waiting on you" strip. |
 
 Idempotency: every tap in the UI mints one key per (lead, step, action) and reuses it on a double-tap,

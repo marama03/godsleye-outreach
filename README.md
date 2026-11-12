@@ -64,7 +64,9 @@ The dashboard runs on your own computer, where your agent runs. Nothing is hoste
 
 On a fresh install the first screen offers **Load the demo** (invented people, so you can click everything) or **Create a campaign**. **Manage campaign** in the sidebar holds the delete control (you type the campaign's name to confirm, and a copy is kept in `app/data/deleted/`). The **«** button at the bottom of the sidebar collapses it to icons.
 
-Connect your sheet by pasting its link into the strip at the top of Today, or by giving it to the Scout. Your data lives in `app/data/`, which stays on your computer and is never overwritten by an update.
+Connect your sheet by pasting its link into the strip at the top of Today, or by giving it to the Scout. **To update, ask your agent to update the dashboard.** It runs `setup-dashboard.sh --update`, which works for a git install and for a zip install (data in `app/data/` is kept).
+
+Your data lives in `app/data/`, which stays on your computer and is never overwritten by an update.
 
 ## What is in here
 

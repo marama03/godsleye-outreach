@@ -15,11 +15,11 @@ export function refuseReason(lead: Lead, chain: Chain, allEventsForLead: LedgerE
   const waiting = !!lastReply && (!lastSent || lastSent.ts_utc < lastReply.ts_utc) && live[live.length - 1]?.kind === "replied";
 
   if (kind === "invite_sent") {
-    if (withdrawn) return "this invitation was dropped; it cannot be logged as sent";
+    if (withdrawn) return "this invitation was marked withdrawn; it cannot be logged as sent";
     return null;
   }
   if (kind === "accepted") {
-    if (withdrawn) return "this invitation was dropped; it cannot be accepted";
+    if (withdrawn) return "this invitation was marked withdrawn; it cannot be accepted";
     if (!invited) return "this person was never invited, so there is no invitation to accept; log the invitation first";
     return null;
   }
@@ -31,7 +31,7 @@ export function refuseReason(lead: Lead, chain: Chain, allEventsForLead: LedgerE
     }
     if (!accepted) return invited ? "they have not accepted yet; messages start after acceptance (log it as accepted first)" : "this person was never invited or accepted; log the invitation first";
     if (lead.do_not_contact) return "this person is marked do not contact";
-    if (withdrawn) return "this invitation was dropped";
+    if (withdrawn) return "this invitation was marked withdrawn";
     if (step === null) return "step is required";
     if (lastReply && kind === "skipped") return "they replied; the sequence has stopped";
     if (kind === "sent" && lastReply && !live.some((e) => e.kind === "sent" && e.ts_utc > lastReply.ts_utc)) return "they replied; answer them (I answered) instead of sending the next step";
@@ -45,7 +45,7 @@ export function refuseReason(lead: Lead, chain: Chain, allEventsForLead: LedgerE
     return null;
   }
   if (kind === "withdrawn") {
-    if (accepted) return "they accepted; an accepted connection cannot be a dropped invitation";
+    if (accepted) return "they accepted; an accepted connection cannot be a withdrawn invitation";
     if (!invited) return "this person was never invited, so there is nothing to drop";
     return null;
   }

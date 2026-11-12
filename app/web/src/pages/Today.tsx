@@ -106,7 +106,7 @@ export default function Today() {
           <p className="mt-1 text-sm text-brand-muted">{fmtWeekdayDate(data.date)} · <span className="font-mono">{active.id}</span></p>
         </div>
         <div className="text-right text-sm text-brand-muted">
-          {data.cards.length} due · cap {data.daily_cap}
+          {data.cards.length} due{data.daily_cap > 0 ? ` · target ${data.daily_cap}` : ""}
           {data.overflow_count > 0 && data.overflow_rolls_to && (
             <div className="text-xs">+{data.overflow_count} roll to {fmtWeekdayDate(data.overflow_rolls_to)}</div>
           )}

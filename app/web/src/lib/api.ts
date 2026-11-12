@@ -176,6 +176,8 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ action: "variants", contact_id: body.contact_id, stage: body.stage, variants: [{ slot: body.slot, body: body.text, stage: body.stage }] }),
     }).then(j<{ ok: boolean; error?: string; variants?: string[] }>),
+  setTarget: (id: string, daily_cap: number) =>
+    fetch(`/api/campaigns/${encodeURIComponent(id)}/target`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ daily_cap }) }).then(j<{ ok: boolean; daily_cap: number }>),
   deleteCampaign: (id: string, confirm: string) =>
     fetch(`/api/campaigns/${encodeURIComponent(id)}`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm }) }).then(j<{ ok: boolean; removed: { campaign: string; leads: number; events: number } }>),
   loadDemo: () => fetch("/api/demo", { method: "POST" }).then(j<{ created: boolean; campaign_id: string }>),

@@ -89,8 +89,8 @@ export default function NewCampaign() {
             {selected && <p className="mt-1 text-xs text-brand-muted">offsets {selected.offsets.join(", ")} · frozen after create</p>}
           </div>
           <div>
-            <label className="label" htmlFor="cap">Daily cap</label>
-            <input id="cap" type="number" min={1} className="input" value={cap} onChange={(e) => setCap(Number(e.target.value))} required />
+            <label className="label" htmlFor="cap">Daily invite target (0 = none)</label>
+            <input id="cap" type="number" min={0} className="input" value={cap} onChange={(e) => setCap(Number(e.target.value))} required />
           </div>
           <div>
             <label className="label" htmlFor="start">Start date</label>
