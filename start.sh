@@ -44,6 +44,10 @@ fi
 # Port 8787 is the API; if something else already has it, the app is probably already running.
 if curl -s -o /dev/null --max-time 2 http://127.0.0.1:8787/api/health; then
   say "It is already running — opening the dashboard."
+  say "  Serving from: $(curl -s --max-time 2 http://127.0.0.1:8787/api/health | tr ',' '
+' | grep -E 'app_dir|started_at|screen_built' | tr -d '"{}' | tr '
+' ' ')"
+  say "  If you just updated or unzipped a new copy, close the old dashboard window and run this again."
   ( sleep 1; command -v open >/dev/null 2>&1 && open "$URL" || true ) >/dev/null 2>&1 &
   say "Dashboard: $URL"
   say "You can close this window; the app keeps running until you close it or the terminal it lives in."

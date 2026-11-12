@@ -56,6 +56,8 @@ function asyncRoute(fn: (req: Request, res: Response) => Promise<unknown>) {
   return (req: Request, res: Response, next: NextFunction) => fn(req, res).catch(next);
 }
 
+const STARTED_AT = new Date().toISOString();
+
 export function createApp() {
   const app = express();
   app.use(express.json({ limit: "256kb" }));
@@ -71,8 +73,13 @@ export function createApp() {
 
   app.get("/api/health", asyncRoute(async (_req, res) => {
     const db = await loadDb();
+    let screen_built: string | null = null;
+    try { screen_built = (await fs.stat(path.join(PROJECT_ROOT, "web", "dist", "index.html"))).mtime.toISOString(); } catch { /* not built */ }
     res.json({
       ok: true,
+      started_at: STARTED_AT,
+      screen_built,
+      app_dir: PROJECT_ROOT,
       campaign_count: db.campaigns.length,
       lead_count: db.leads.length,
       event_count: db.events.length,
