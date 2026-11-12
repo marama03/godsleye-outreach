@@ -33,7 +33,7 @@ function Empty({ children }: { children: ReactNode }) {
 }
 
 export default function Workday() {
-  const { active } = useCampaign();
+  const { active, setActiveId, refresh: refreshCampaigns } = useCampaign();
   const toast = useToast();
   const side = useSide();
   const [data, setData] = useState<WorkdayResponse | null>(null);
@@ -212,7 +212,16 @@ export default function Workday() {
     window.setTimeout(() => setCopied((c) => (c === card.lead_id ? null : c)), 1500);
   }
 
-  if (!active) return <div className="px-6 py-10 text-brand-muted">No campaign yet. <Link className="underline" to="/campaigns/new">Create one.</Link></div>;
+  if (!active) return (
+    <div className="mx-auto max-w-[640px] px-6 py-12">
+      <h1 className="font-display text-3xl font-black">Welcome</h1>
+      <p className="mt-2 text-brand-muted">No campaign yet. Make your own, or look around first with invented people. You can delete the demo any time.</p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link className="btn-primary" to="/campaigns/new">Create a campaign</Link>
+        <button className="btn-secondary" onClick={async () => { try { const r = await api.loadDemo(); setActiveId(r.campaign_id); await refreshCampaigns(); } catch (e: any) { toast.show({ text: e.message ?? String(e), ttlMs: 4000 }); } }}>Load the demo</button>
+      </div>
+    </div>
+  );
   if (!data) return <div className="px-6 py-10 text-brand-muted">Loading…</div>;
 
   const dueNow = sheetOn ? sheetRows?.length ?? 0 : data.cards.length;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api, type CampaignResponse, fmtWeekdayDate } from "../lib/api";
 import { useCampaign } from "../lib/campaign-context";
 
@@ -16,7 +16,11 @@ function Counter({ label, value, to }: { label: string; value: number; to?: stri
 export default function CampaignHome() {
   const { id } = useParams();
   const [sp] = useSearchParams();
-  const { setActiveId } = useCampaign();
+  const { setActiveId, refresh } = useCampaign();
+  const nav = useNavigate();
+  const [confirmText, setConfirmText] = useState("");
+  const [delErr, setDelErr] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [data, setData] = useState<CampaignResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -75,12 +79,34 @@ export default function CampaignHome() {
         <Counter label="Due today" value={data.counters.due_today} to="/today" />
       </div>
 
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex flex-wrap gap-3">
         <Link to="/scout" className="btn-secondary">Open Scout</Link>
         <Link to="/today" className="btn-primary">Open Today</Link>
         <Link to="/ledger" className="btn-ghost">Ledger</Link>
       </div>
       <p className="mt-4 text-xs text-brand-muted">All four counters are computed from the event ledger on every load. None of them is stored.</p>
+
+      <section className="card mt-10 border-brand-danger p-5" aria-label="Delete campaign">
+        <h2 className="text-lg font-bold">Delete this campaign</h2>
+        <p className="mt-1 text-sm text-brand-muted">
+          Removes <b>{c.name}</b> with its {data.counters.invited} leads and all their history. Other campaigns are not touched. A copy is kept in <code className="font-mono">data/deleted/</code> so it can be restored by hand.
+        </p>
+        <form
+          className="mt-3 flex flex-wrap items-center gap-2"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setDeleting(true); setDelErr(null);
+            try { await api.deleteCampaign(c.id, confirmText); await refresh(); nav("/today"); }
+            catch (err: any) { setDelErr(err.message ?? String(err)); }
+            finally { setDeleting(false); }
+          }}
+        >
+          <label className="sr-only" htmlFor="del-confirm">Type the campaign name to confirm</label>
+          <input id="del-confirm" className="input min-w-0 flex-1" placeholder={`Type “${c.name}” to confirm`} value={confirmText} onChange={(e) => setConfirmText(e.target.value)} autoComplete="off" />
+          <button className="btn-danger" disabled={deleting || confirmText.trim() !== c.name}>{deleting ? "Deleting…" : "Delete campaign"}</button>
+        </form>
+        {delErr && <p className="mt-2 text-sm text-brand-danger">{delErr}</p>}
+      </section>
     </div>
   );
 }

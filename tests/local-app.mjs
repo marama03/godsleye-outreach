@@ -193,6 +193,36 @@ try {
     check("clearing the link disconnects", off.status === 200 && (await get("/api/config")).connected === false);
   }
 
+  // 10. demo campaign and delete campaign
+  {
+    const before = await get("/api/campaigns");
+    const d1 = await post("/api/demo", {});
+    check("Load the demo creates the demo campaign", d1.status === 201 && d1.body.created === true, d1);
+    const d2 = await post("/api/demo", {});
+    check("loading the demo twice does not duplicate it", d2.status === 200 && d2.body.created === false && d2.body.campaign_id === d1.body.campaign_id, d2);
+    const demoId = d1.body.campaign_id;
+    const wdDemo = await get(`/api/workday?campaign=${demoId}`);
+    check("demo shows cards, a waiting reply, stale invite and a scorecard", wdDemo.cards.length >= 1 && wdDemo.waiting_on_you.length === 1 && wdDemo.stale_invites.length === 1 && wdDemo.scorecard.all.booked === 1, { cards: wdDemo.cards.length, waiting: wdDemo.waiting_on_you.length, stale: wdDemo.stale_invites.length, sc: wdDemo.scorecard.all });
+    const demoName = (await get("/api/campaigns")).find((c) => c.id === demoId).name;
+    const w1 = await fetch(base + `/api/campaigns/${demoId}`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm: "nope" }) });
+    check("delete without the exact name is refused", w1.status === 400);
+    check("refused delete changed nothing", (await get("/api/campaigns")).some((c) => c.id === demoId));
+    const leadsBefore = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8")).filter((l) => l.campaign_id !== demoId).length;
+    const w2 = await fetch(base + `/api/campaigns/${demoId}`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm: demoName }) });
+    const w2b = await w2.json();
+    check("delete with the exact name works and reports what went", w2.status === 200 && w2b.removed.leads === 10 && w2b.removed.events >= 7, w2b);
+    const after = await get("/api/campaigns");
+    check("deleted campaign is gone and the others are untouched", !after.some((c) => c.id === demoId) && after.length === before.length, after.map((c) => c.name));
+    const leadsAfter = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8"));
+    check("other campaigns' leads are untouched", leadsAfter.filter((l) => l.campaign_id !== demoId).length === leadsBefore && !leadsAfter.some((l) => l.campaign_id === demoId));
+    const evAfter = JSON.parse(readFileSync(join(DATA, "events.json"), "utf8"));
+    check("deleted campaign's events are gone", !evAfter.some((e) => e.campaign_id === demoId));
+    const { readdirSync } = await import("node:fs");
+    check("a restorable copy is kept in data/deleted", readdirSync(join(DATA, "deleted")).some((f) => f.startsWith(demoId)));
+    const w3 = await fetch(base + `/api/campaigns/${demoId}`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm: demoName }) });
+    check("deleting twice is a clean 404", w3.status === 404);
+  }
+
   const files = ["campaigns.json", "leads.json", "events.json"].every((f) => { try { JSON.parse(readFileSync(join(DATA, f), "utf8")); return true; } catch { return false; } });
   check("data files are valid JSON on disk", files);
 } catch (e) {

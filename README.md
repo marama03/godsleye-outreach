@@ -60,6 +60,8 @@ The dashboard runs on your own computer, where your agent runs. Nothing is hoste
 - **Double-click:** `start.command` on a Mac, `start.bat` on Windows, or `./start.sh`. It checks Node, installs once, starts the app and opens the browser.
 - **By hand:** `cd app`, `npm install`, `npm run dev`, then open http://127.0.0.1:5173.
 
+On a fresh install the first screen offers **Load the demo** (invented people, so you can click everything) or **Create a campaign**. **Manage campaign** in the sidebar holds the delete control (you type the campaign's name to confirm, and a copy is kept in `app/data/deleted/`). The **«** button at the bottom of the sidebar collapses it to icons.
+
 Connect your sheet by pasting its link into the strip at the top of Today, or by giving it to the Scout. Your data lives in `app/data/`, which stays on your computer and is never overwritten by an update.
 
 ## What is in here

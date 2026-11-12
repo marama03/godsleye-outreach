@@ -1,9 +1,11 @@
+import { promises as fs } from "node:fs";
 // Express API. All JSON. No PUT/PATCH/DELETE on events, ever (R2).
 import express, { type Request, type Response, type NextFunction } from "express";
 import path from "node:path";
 import { existsSync } from "node:fs";
 import {
   loadDb,
+  DATA_DIR,
   loadConfig,
   saveConfig,
   withLock,
@@ -17,6 +19,7 @@ import {
 import { sheetConfigured, syncFromSheet, pushLeadToSheet, bridgeToday, bridgeAct } from "./sheet.js";
 import { counters, todayQueue, scoutRows, ledger, chainKey, workday } from "./queries.js";
 import { registerLive } from "./live.js";
+import { seedDemo } from "./demo.js";
 import { todayYmd } from "../shared/dates.js";
 import { campaignIdFor, newEventId, sha256Hex, variantFor } from "../shared/hash.js";
 import { EVENT_KINDS, type Campaign, type EventKind, type LedgerEvent } from "../shared/types.js";
@@ -123,6 +126,33 @@ export function createApp() {
       return { campaign, event: evt };
     });
     res.status(201).json(out);
+  }));
+
+  // Delete a campaign with everything in it (its leads and events). A copy is kept in data/deleted/ so it can be restored.
+  app.delete("/api/campaigns/:id", asyncRoute(async (req, res) => {
+    const id = String(req.params.id);
+    const confirm = String(req.body?.confirm ?? "");
+    const out = await withLock(async () => {
+      const db = await loadDb();
+      const c = db.campaigns.find((x) => x.id === id);
+      if (!c) return { status: 404, body: { error: "campaign not found" } };
+      if (confirm.trim() !== c.name) return { status: 400, body: { error: "type the campaign name exactly to confirm" } };
+      const leads = db.leads.filter((l) => l.campaign_id === id);
+      const events = db.events.filter((e) => e.campaign_id === id);
+      const dir = path.join(DATA_DIR, "deleted");
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(path.join(dir, `${id}-${Date.now()}.json`), JSON.stringify({ campaign: c, leads, events }, null, 2));
+      await saveCampaigns(db.campaigns.filter((x) => x.id !== id));
+      await saveLeads(db.leads.filter((l) => l.campaign_id !== id));
+      await saveEvents(db.events.filter((e) => e.campaign_id !== id));
+      return { status: 200, body: { ok: true, removed: { campaign: c.name, leads: leads.length, events: events.length } } };
+    });
+    res.status(out.status).json(out.body);
+  }));
+
+  app.post("/api/demo", asyncRoute(async (_req, res) => {
+    const r = await withLock(() => seedDemo());
+    res.status(r.created ? 201 : 200).json(r);
   }));
 
   app.get("/api/campaigns/:id", asyncRoute(async (req, res) => {
