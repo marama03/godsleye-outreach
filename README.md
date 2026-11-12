@@ -72,7 +72,7 @@ Connect your sheet by pasting its link into the strip at the top of Today, or by
   row is the one thing this design refuses. Section 6 of the manual explains when it is worth having.
 - `app/` — the dashboard: Today, the row cards, the send and undo path.
 - `start.command`, `start.bat`, `start.sh`, `setup-dashboard.sh` — the launchers described above.
-- `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). `node tests/ui.mjs` drives the dashboard in a real Chrome and clicks every button (58 checks; run `npm run build` in `app/` first). `node tests/local-app.mjs` runs 47 checks on the dashboard's local store (needs `npm install` in `app/`): sent, skip, undo, double-click and restart, with no sheet or token. None of the three touches a real sheet; none of them needs a Google credential.
+- `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). `node tests/ui.mjs` drives the dashboard in a real Chrome and clicks every button (77 checks; run `npm run build` in `app/` first). `node tests/local-app.mjs` runs 47 checks on the dashboard's local store (needs `npm install` in `app/`): sent, skip, undo, double-click and restart, with no sheet or token. None of the three touches a real sheet; none of them needs a Google credential.
 
 ## Status
 

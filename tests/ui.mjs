@@ -47,6 +47,14 @@ try {
   check("empty install shows Welcome with Create and Load the demo", /Welcome/.test(await txt()) && /Load the demo/.test(await txt()) && /Create a campaign/.test(await txt()));
   check("click Load the demo", await click("Load the demo"));
   check("demo campaign appears on Today", await waitTxt(/Q4 Service Owners \(demo\)/) && await waitTxt(/Scorecard/));
+  {
+    const camp = (await (await fetch(BASE + "/api/campaigns")).json())[0];
+    const { readFileSync } = await import("node:fs");
+    const leads = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8"));
+    leads.push({ ...leads.find((l) => l.name === "Old Contact"), lead_id: "demoold2", name: "Older Contact", company: "Sleepy Inc", linkedin_url: "https://www.linkedin.com/in/example-old2", invited_at: new Date(Date.now() - 140 * 864e5).toISOString() });
+    writeFileSync(join(DATA, "leads.json"), JSON.stringify(leads));
+    await sleep(2500);
+  }
   const t1 = await txt();
   check("demo shows waiting-on-you, messages due, 90+ days and invite sections", /They replied, waiting on you/.test(t1) && /Messages due/.test(t1) && /Invites waiting 90\+ days/.test(t1) && /New people to invite/.test(t1));
   await shot("suite-demo.png");
@@ -119,8 +127,12 @@ try {
   check("Accepted moves it out of Did they accept?", (await accRows()) === acc0 - 1, [acc0, await accRows()]);
   check("Drop on a pending invite", await clickIn(`document.querySelector('#sec-accept')`, "Drop"));
   await sleep(1500);
-  check("I withdrew it on a 90+ day invite", await clickIn(`document.querySelector('#sec-stale')`, "I withdrew it") || /Invites waiting 90\+ days/.test(await txt()) === false);
+  check("two invites are listed under 90+ days", /Invites waiting 90\+ days\s*2/.test(await txt()));
+  check("I withdrew it on one 90+ day invite", await clickIn(`document.querySelector('#sec-stale')`, "I withdrew it"));
   await sleep(1500);
+  check("one 90+ day invite is left", /Invites waiting 90\+ days\s*1/.test(await txt()));
+  check("I withdrew all clears the rest", await clickIn(`document.querySelector('#sec-stale')`, "I withdrew all"));
+  await sleep(2000);
   check("90+ day section is gone once withdrawn", !(await ev(`!!document.querySelector('#sec-stale')`)));
   check("I invited on LinkedIn on a new prospect", await clickIn(`document.querySelector('#sec-invite')`, "I invited on LinkedIn"));
   await sleep(1500);
@@ -129,6 +141,43 @@ try {
   await nav("/ledger");
   check("Ledger shows skipped, replied, sent, withdrawn and not a fit rows", ["skipped", "replied", "sent", "withdrawn", "not_a_fit"].every((k) => new RegExp(k).test(txt_cache = null) || true));
   check("Ledger page lists events", /sent/.test(await txt()) && /skipped/.test(await txt()));
+
+  {
+    const { readFileSync } = await import("node:fs");
+    const leads = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8"));
+    leads.push({ ...leads.find((l) => l.name === "New Prospect"), lead_id: "demofresh1", name: "Fresh Prospect", company: "Newco", linkedin_url: "https://www.linkedin.com/in/example-fresh1", invited_at: null, accepted_at: null });
+    writeFileSync(join(DATA, "leads.json"), JSON.stringify(leads));
+    await sleep(2500);
+  }
+  await nav("/scout");
+  check("Scout page lists people to invite and people waiting", /to invite/.test(await txt()));
+  const scoutRows = () => ev(`document.querySelectorAll('main button, article button').length`);
+  check("Scout: Invitation sent", await click("Invitation sent"));
+  await sleep(1500);
+  check("Scout: Invitation sent shows an Undo toast", await waitTxt(/Undo \(/, 3000));
+  check("Scout: Undo", await click("Undo"));
+  await sleep(1200);
+  check("Scout: Mark accepted", await click("Mark accepted"));
+  await sleep(1500);
+  check("Scout page still renders", /Scout|to invite/.test(await txt()));
+
+  await nav("/today");
+  check("Brand colours opens the panel", await click("Brand colours") && await waitTxt(/Hex codes/));
+  const firstHex = ev(`(()=>{const el=document.querySelector('[aria-label="Brand colours"] input.font-mono, aside ~ * input.font-mono, input.input.font-mono');return !!el})()`);
+  check("Brand panel has hex fields", await firstHex);
+  await setVal("input.input.font-mono", "#112233");
+  await sleep(500);
+  check("changing a colour enables Reset to default", !(await ev(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Reset to default').disabled`)));
+  check("Paste JSON toggles the JSON box", await click("Paste JSON") && await ev(`!!document.querySelector('textarea')`));
+  check("Hide JSON closes it", await click("Hide JSON"));
+  check("Reset to default", await click("Reset to default"));
+  await sleep(400);
+  check("Reset disables itself again", await ev(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Reset to default').disabled`));
+  check("Close the Brand panel", await click("Close"));
+
+  await nav("/ledger");
+  check("Ledger: Lead state tab", await click("Lead state") && /waiting_on_me/.test(await txt()));
+  check("Ledger: back to taps tab", await click("What your taps") && /idempotency_key/.test(await txt()));
 
   await nav("/today");
   check("Manage campaign link is in the sidebar", await click("Manage campaign"));
