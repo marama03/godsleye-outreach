@@ -53,7 +53,7 @@ export default function BrandPanel({ open, onClose }: { open: boolean; onClose: 
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold">Brand</h2>
-              <p className="text-xs text-brand-muted">Hex codes. Applies live, saved in this browser only. Default palette — used for every campaign unless you pick another.</p>
+              <p className="text-xs text-brand-muted">Hex codes. Applies live, saved in this browser only — one palette for the whole app.</p>
             </div>
             <button className="btn-ghost" onClick={onClose}>Close</button>
           </div>
