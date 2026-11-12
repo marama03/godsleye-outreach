@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fallbacks only — theme.tsx overwrites these on load (default palette). */
+:root {
+  --primary: #ef4124;
+  --primary-hover: #cb371f;
+  --primary-soft: #fdeae7;
+  --on-primary: #ffffff;
+  --accent: #ec7323;
+  --accent-soft: #fdeadc;
+  --on-accent: #ffffff;
+  --highlight: #efca08;
+  --highlight-soft: #faefb5;
+  --on-highlight: #000022;
+  --navy: #000022;
+  --navy-soft: #1f1f3d;
+  --navy-muted: #8c8c9b;
+  --on-navy: #ffffff;
+  --cream: #ece4b7;
+  --on-cream: #000022;
+  --neutral: #666666;
+  --muted: #7d7d7d;
+  --surface: #f3f3f3;
+  --card: #ffffff;
+  --ink: #000022;
+  --border: #d6d6d6;
+  --ok: #1f7a4d;
+  --ok-soft: #e0efe7;
+  --danger: #b33119;
+  --danger-soft: #fdece9;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn border-brand-primary bg-brand-primary text-brand-on-primary hover:bg-brand-primary-hover hover:border-brand-primary-hover;
+  }
+  .btn-secondary {
+    @apply btn border-brand-border bg-brand-card text-brand-ink hover:bg-brand-primary-soft;
+  }
+  .btn-ghost {
+    @apply btn border-transparent bg-transparent text-brand-muted hover:bg-brand-primary-soft hover:text-brand-ink;
+  }
+  .btn-danger {
+    @apply btn border-brand-danger bg-brand-card text-brand-danger hover:bg-brand-danger-soft;
+  }
+  .btn-link {
+    @apply inline-flex items-center px-1 py-1.5 text-sm font-semibold text-brand-muted underline hover:text-brand-ink;
+  }
+  .card {
+    @apply rounded-lg border border-brand-border bg-brand-card shadow-sm;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-brand-muted;
+  }
+  .input {
+    @apply w-full rounded-md border border-brand-border bg-brand-card px-3 py-2 text-sm text-brand-ink focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary;
+  }
+  .pill {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold;
+  }
+  .pill-a {
+    @apply pill bg-brand-primary-soft text-brand-primary;
+  }
+  .pill-b {
+    @apply pill bg-brand-accent-soft text-brand-accent;
+  }
+}
