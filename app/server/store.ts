@@ -133,8 +133,10 @@ export async function writeDossier(fileName: string, markdown: string): Promise<
 }
 
 export async function readDossier(relPath: string): Promise<string | null> {
-  const full = path.resolve(PROJECT_ROOT, relPath);
-  if (!full.startsWith(DOSSIER_DIR)) return null; // never read outside /data/dossiers
+  // Accept "x.md", "dossiers/x.md" and "data/dossiers/x.md"; always resolve inside the dossiers folder.
+  const rel = relPath.replace(/\\/g, "/").replace(/^(\.\/)?(data\/)?(dossiers\/)?/, "");
+  const full = path.resolve(DOSSIER_DIR, rel);
+  if (!full.startsWith(DOSSIER_DIR + path.sep)) return null; // never read outside the dossiers folder
   try {
     return await fs.readFile(full, "utf8");
   } catch {

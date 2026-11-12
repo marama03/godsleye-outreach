@@ -179,6 +179,7 @@ export const api = {
   deleteCampaign: (id: string, confirm: string) =>
     fetch(`/api/campaigns/${encodeURIComponent(id)}`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm }) }).then(j<{ ok: boolean; removed: { campaign: string; leads: number; events: number } }>),
   loadDemo: () => fetch("/api/demo", { method: "POST" }).then(j<{ created: boolean; campaign_id: string }>),
+  resetDemo: () => fetch("/api/demo", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ reset: true }) }).then(j<{ created: boolean; campaign_id: string }>),
   config: () => fetch("/api/config").then(j<{ connected: boolean; sheet_url: string | null; sheet_title: string | null; connected_at: string | null; last_synced_at: string | null }>),
   setSheetUrl: (sheet_url: string) =>
     fetch("/api/config", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sheet_url }) }).then(j<{ ok: boolean; connected: boolean }>),

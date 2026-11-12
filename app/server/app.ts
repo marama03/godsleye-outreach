@@ -19,13 +19,33 @@ import {
 import { sheetConfigured, syncFromSheet, pushLeadToSheet, bridgeToday, bridgeAct } from "./sheet.js";
 import { counters, todayQueue, scoutRows, ledger, chainKey, chainFor, workday } from "./queries.js";
 import { registerLive } from "./live.js";
-import { seedDemo } from "./demo.js";
+import { seedDemo, resetDemo } from "./demo.js";
 import { refuseReason, undoRefusal } from "./rules.js";
 import { todayYmd } from "../shared/dates.js";
 import { campaignIdFor, newEventId, sha256Hex, variantFor } from "../shared/hash.js";
 import { EVENT_KINDS, type Campaign, type EventKind, type LedgerEvent } from "../shared/types.js";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const inline = (s: string) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
+
+/** A small, safe markdown-to-HTML for dossiers: headings, bullets, bold, italics, paragraphs. */
+function dossierPage(md: string): string {
+  const out: string[] = [];
+  let list = false;
+  const closeList = () => { if (list) { out.push("</ul>"); list = false; } };
+  for (const raw of md.split("\n")) {
+    const line = raw.trimEnd();
+    if (/^#{1,3} /.test(line)) { closeList(); const lvl = line.match(/^#+/)![0].length; out.push(`<h${lvl}>${inline(line.replace(/^#+ /, ""))}</h${lvl}>`); }
+    else if (/^[-*] /.test(line)) { if (!list) { out.push("<ul>"); list = true; } out.push(`<li>${inline(line.slice(2))}</li>`); }
+    else if (line === "") closeList();
+    else { closeList(); out.push(`<p>${inline(line)}</p>`); }
+  }
+  closeList();
+  const title = esc((md.split("\n").find((l) => l.startsWith("#")) ?? "Dossier").replace(/^#+ /, ""));
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>body{font:16px/1.55 system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;color:#1c1917}h1{font-size:1.6rem}h2{font-size:1.1rem;margin-top:1.6rem;border-bottom:1px solid #e7e5e4;padding-bottom:.2rem}li{margin:.25rem 0}</style></head><body>${out.join("\n")}</body></html>`;
+}
 
 function bad(res: Response, msg: string, code = 400) {
   return res.status(code).json({ error: msg });
@@ -151,7 +171,11 @@ export function createApp() {
     res.status(out.status).json(out.body);
   }));
 
-  app.post("/api/demo", asyncRoute(async (_req, res) => {
+  app.post("/api/demo", asyncRoute(async (req, res) => {
+    if (req.body?.reset === true) {
+      const r = await withLock(() => resetDemo());
+      return res.status(201).json({ created: true, reset: true, ...r });
+    }
     const r = await withLock(() => seedDemo());
     res.status(r.created ? 201 : 200).json(r);
   }));
@@ -316,7 +340,9 @@ export function createApp() {
     const rel = String(req.query.path ?? "");
     const md = await readDossier(rel);
     if (md == null) return bad(res, "dossier not found", 404);
-    res.type("text/markdown").send(md);
+    // A browser opening the link gets a readable page; anything else (an agent) gets the raw markdown.
+    if (String(req.headers.accept ?? "").includes("text/html")) return res.type("html").send(dossierPage(md));
+    res.type("text/markdown; charset=utf-8").send(md);
   }));
 
   // Which sheet is this dashboard paired with? An agent keeps data/config.json; the owner may also paste the link here.

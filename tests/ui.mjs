@@ -70,6 +70,12 @@ try {
   check("demo shows waiting-on-you, messages due, 90+ days and invite sections", /They replied, waiting on you/.test(t1) && /Messages due/.test(t1) && /Invites waiting 90\+ days/.test(t1) && /New people to invite/.test(t1));
   await shot("suite-demo.png");
 
+  {
+    const href = await ev(`[...document.querySelectorAll('a')].find(a=>a.textContent.trim()==='Open dossier')?.getAttribute('href') ?? null`);
+    check("a card has an Open dossier link", !!href, href);
+    const page = await ev(`fetch(${JSON.stringify(href)}, { headers: { Accept: "text/html" } }).then(async r => { const t = await r.text(); return [r.status, t.slice(t.indexOf("<body>"), t.indexOf("<body>") + 200)]; })`);
+    check("Open dossier returns a readable page with the person's name", page[0] === 200 && /<h1>/.test(page[1]), page);
+  }
   check("strip says not connected before a link", /Not connected to a sheet/.test(t1));
   check("click Add sheet link", await click("Add sheet link"));
   await setVal("input[aria-label='Sheet link']", "https://example.com/x");

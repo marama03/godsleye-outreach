@@ -62,7 +62,8 @@ function BrokenCampaign({ id, message }: { id: string; message: string }) {
 export default function CampaignHome() {
   const { id } = useParams();
   const [sp] = useSearchParams();
-  const { setActiveId } = useCampaign();
+  const { setActiveId, refresh } = useCampaign();
+  const [resetting, setResetting] = useState(false);
   const [data, setData] = useState<CampaignResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -128,6 +129,13 @@ export default function CampaignHome() {
       </div>
       <p className="mt-4 text-xs text-brand-muted">All four counters are computed from the event ledger on every load. None of them is stored.</p>
 
+      {c.name.endsWith("(demo)") && (
+        <section className="card mt-8 p-5" aria-label="Reset demo">
+          <h2 className="text-lg font-bold">Reset the demo</h2>
+          <p className="mt-1 text-sm text-brand-muted">Puts this demo back to its starting state, with the dossiers, so every run begins the same way. Your other campaigns are not touched.</p>
+          <button className="btn-secondary mt-3" disabled={resetting} onClick={async () => { setResetting(true); try { const r = await api.resetDemo(); setActiveId(r.campaign_id); await refresh(); } finally { setResetting(false); } }}>{resetting ? "Resetting…" : "Reset demo"}</button>
+        </section>
+      )}
       <DeleteZone id={c.id} name={c.name} leadCount={data.counters.invited} />
     </div>
   );

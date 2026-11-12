@@ -269,6 +269,45 @@ try {
     check("and such a campaign can still be deleted", dl.status === 200);
   }
 
+  // 12. demo dossiers open, and the demo can be reset
+  {
+    const d = await post("/api/demo", {});
+    const demoId = d.body.campaign_id;
+    const wd = await get(`/api/workday?campaign=${demoId}`);
+    const people = [...wd.cards, ...wd.researching.filter((r) => r.dossier_path)];
+    const withDossier = wd.cards.filter((c) => c.dossier_path);
+    check("every demo person who is due has a dossier link", withDossier.length === wd.cards.length && wd.cards.length >= 1, { cards: wd.cards.length, withDossier: withDossier.length });
+    let allOk = true; const bad = [];
+    for (const f of ["demoa1.md", "demob2.md", "democ3.md", "demod4.md", "demoe5.md"]) {
+      const r = await fetch(base + `/api/dossier?path=${f}`);
+      const t = await r.text();
+      if (r.status !== 200 || t.length < 500 || !/## Why now/.test(t) || !/## Cautions/.test(t)) { allOk = false; bad.push([f, r.status, t.length]); }
+    }
+    check("all five demo dossiers open and are real briefs (who, why now, angle, cautions)", allOk, bad);
+    {
+      const paths = [...new Set([...wd.cards, ...wd.researching, ...wd.waiting_on_you].map((c) => c.dossier_path).filter(Boolean))];
+      let ok = paths.length >= 3; const miss = [];
+      for (const pth of paths) { const r = await fetch(base + `/api/dossier?path=${encodeURIComponent(pth)}`); if (r.status !== 200 || !/^data\/dossiers\/demo\w+\.md$/.test(pth)) { ok = false; miss.push([pth, r.status]); } }
+      check("every dossier_path the demo stores (data/dossiers/<id>.md) opens with 200", ok, { paths, miss });
+    }
+    const html = await fetch(base + "/api/dossier?path=demoa1.md", { headers: { accept: "text/html" } });
+    const ht = await html.text();
+    check("a browser gets a readable page, not a download", html.status === 200 && /text\/html/.test(html.headers.get("content-type")) && /<h1>Dana Whitfield/.test(ht) && /<li>/.test(ht), html.headers.get("content-type"));
+    const esc = await fetch(base + "/api/dossier?path=../leads.json");
+    check("a dossier path cannot escape the dossiers folder", esc.status === 404);
+    // work on the demo, then reset it
+    await post("/api/events", { campaign_id: demoId, lead_id: wd.cards[0].lead_id, kind: "skipped", step: wd.cards[0].step, idempotency_key: "demo-reset-skip" });
+    const wd2 = await get(`/api/workday?campaign=${demoId}`);
+    check("a click on the demo changes it", wd2.cards.length === wd.cards.length - 1, [wd.cards.length, wd2.cards.length]);
+    const rs = await post("/api/demo", { reset: true });
+    check("Reset demo answers 201 with the campaign", rs.status === 201 && rs.body.campaign_id === demoId, rs);
+    const wd3 = await get(`/api/workday?campaign=${demoId}`);
+    check("after the reset the demo is back to its starting state", wd3.cards.length === wd.cards.length && wd3.waiting_on_you.length === 1, [wd3.cards.length, wd3.waiting_on_you.length]);
+    check("only one demo campaign exists after a reset", (await get("/api/campaigns")).filter((c) => /\(demo\)$/.test(c.name)).length === 1);
+    const campsKeep = await get("/api/campaigns");
+    check("other campaigns survive a reset", campsKeep.some((c) => c.name === "Local test"));
+  }
+
   const files = ["campaigns.json", "leads.json", "events.json"].every((f) => { try { JSON.parse(readFileSync(join(DATA, f), "utf8")); return true; } catch { return false; } });
   check("data files are valid JSON on disk", files);
 } catch (e) {

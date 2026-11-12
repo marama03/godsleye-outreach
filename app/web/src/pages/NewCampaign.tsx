@@ -101,6 +101,7 @@ export default function NewCampaign() {
         <div className="flex items-center justify-between">
           <p className="text-xs text-brand-muted">Create writes one campaign row and one <code className="font-mono">campaign_created</code> event. Nothing else.</p>
           <button className="btn-primary" disabled={busy || !selected}>{busy ? "Creating…" : "Create campaign"}</button>
+          <button type="button" className="btn-link ml-3" onClick={async () => { try { const r = await api.loadDemo(); setActiveId(r.campaign_id); await refresh(); nav("/today"); } catch (e: any) { setErr(String(e.message ?? e)); } }}>or load the demo</button>
         </div>
       </form>
     </div>
