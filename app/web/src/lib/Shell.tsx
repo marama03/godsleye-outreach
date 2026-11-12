@@ -56,7 +56,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         >
           <Link to="/today" className="flex items-center gap-2.5 font-display text-lg font-extrabold">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-brand-accent text-sm text-brand-on-accent" aria-hidden>👁</span>
-            God’s L’Eye
+            <span className="flex flex-col leading-tight">God’s L’Eye<span className="text-[10px] font-semibold opacity-70">GenTeam (Genspark) Edition</span></span>
           </Link>
 
           {value.refresh && (

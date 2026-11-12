@@ -1,8 +1,8 @@
 {
-  "name": "linkedin-tracker-demo",
+  "name": "godsleye-genteam-edition",
   "version": "1.0.0",
   "private": true,
-  "description": "Broadcast demo of a LinkedIn-prospecting tracker. Local JSON files only. No network at runtime.",
+  "description": "God’s L’Eye — GenTeam (Genspark) Edition: a LinkedIn-prospecting tracker dashboard. Local JSON files only. No network at runtime.",
   "type": "module",
   "scripts": {
     "dev": "concurrently -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",

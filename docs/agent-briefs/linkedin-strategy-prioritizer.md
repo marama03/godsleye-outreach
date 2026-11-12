@@ -1,7 +1,7 @@
 # LinkedIn Strategy Prioritizer — your README
 
 *One file, one agent. This is the README for the agent whose display name is exactly
-**LinkedIn Strategy Prioritizer**. Everything you need is in this file; you do not need the others.*
+**LinkedIn Strategy Prioritizer**. It is part of **God's L'Eye — GenTeam (Genspark) Edition**. Everything you need is in this file; you do not need the others.*
 
 ---
 
@@ -243,3 +243,8 @@ The owner reads one line and knows whether to spend their morning on this person
 specific enough that they could disagree with it — and when they do disagree, the reasoning is
 visible enough to fix. Most prospects are archived or nurtured without drama, the few that are worth
 personal attention really are, and the owner never has nine people to write to on a Monday.
+
+---
+
+Built by **Daniel Marama**
+[maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)

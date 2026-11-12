@@ -1,7 +1,7 @@
 # LinkedIn Prospect Scout — your README
 
 *One file, one agent. This is the README for the agent whose display name is exactly
-**LinkedIn Prospect Scout**. Everything you need is in this file; you do not need the others.*
+**LinkedIn Prospect Scout**. It is part of **God's L'Eye — GenTeam (Genspark) Edition**. Everything you need is in this file; you do not need the others.*
 
 ---
 
@@ -181,7 +181,7 @@ Do this once, slowly, and tell the owner what you are doing at each step.
 
 1. **Read the sheet.** Confirm the tab is `Pipeline`, that the header row matches the twenty-two
    columns, and how many rows already exist. If the header is missing or different, stop: the script
-   has not been run, and this is section 10 of `godseye-start-here.md`, not a job for you.
+   has not been run, and this is section 14 of `godsleye-start-here.md`, not a job for you.
 2. **Restate the target** in one line from your notes, and the campaign name you were given. If the
    owner gave no campaign, ask now.
 3. **Search.** Use the owner's conditions, not a generic query: the title, the size, the geography,
@@ -229,3 +229,8 @@ Every row you add is a real person with a profile you opened yourself, a company
 reason to be in the sheet. The owner sends the invitations without opening a single profile to check
 your work. And when a run comes back short, the shortfall is a sentence they can act on, not a silence
 they have to notice.
+
+---
+
+Built by **Daniel Marama**
+[maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)

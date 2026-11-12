@@ -1,7 +1,7 @@
 # LinkedIn Outreach Tracker — your README
 
 *One file, one agent. This is the README for the agent whose display name is exactly
-**LinkedIn Outreach Tracker**. Everything you need is in this file; you do not need the others.*
+**LinkedIn Outreach Tracker**. It is part of **God's L'Eye — GenTeam (Genspark) Edition**. Everything you need is in this file; you do not need the others.*
 
 ---
 
@@ -241,3 +241,8 @@ An accepted row is `dispatched` within one sweep and `ready` within the hour, an
 to ask where a prospect went. A row that fails says why, in a sentence they can act on. Nothing in the
 sheet is true only because nobody checked it — and when a message was sent, the row knows, because the
 person who sent it said so and the sheet recorded it.
+
+---
+
+Built by **Daniel Marama**
+[maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)

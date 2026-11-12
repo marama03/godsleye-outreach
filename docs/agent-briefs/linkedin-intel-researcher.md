@@ -1,7 +1,7 @@
 # LinkedIn Intel Researcher — your README
 
 *One file, one agent. This is the README for the agent whose display name is exactly
-**LinkedIn Intel Researcher**. Everything you need is in this file; you do not need the others.*
+**LinkedIn Intel Researcher**. It is part of **God's L'Eye — GenTeam (Genspark) Edition**. Everything you need is in this file; you do not need the others.*
 
 ---
 
@@ -270,3 +270,8 @@ The owner reads the dossier and knows, in ninety seconds, what to say and what n
 LinkedIn Strategy Prioritizer can score it without opening another tab, because the evidence sits under each number. The
 "what to avoid" section is the one they use most. And the next prospect in the same field costs half
 the research, because the industry file already has the map.
+
+---
+
+Built by **Daniel Marama**
+[maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)

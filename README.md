@@ -1,6 +1,6 @@
-# God's L'Eye
+# God's L'Eye — GenTeam (Genspark) Edition
 
-A Google Sheet and five narrow agents for LinkedIn outreach you send by hand.
+God's L'Eye — GenTeam (Genspark) Edition is a Google Sheet and five narrow agents for LinkedIn outreach you send by hand.
 
 You describe the buyer. The agents find prospects, research everyone who accepts, decide who is worth
 your time, and write the messages. You send every message yourself, from your own LinkedIn. Nothing in

@@ -1,5 +1,7 @@
 # God's L'Eye — start here
 
+*God's L'Eye — GenTeam (Genspark) Edition*
+
 Read this file once, top to bottom, before you open a spreadsheet. Fifteen minutes of reading, about
 half an hour of doing, and most of the doing is waiting for things to finish. Then you create one
 agent — the Guide — and it walks you through the rest, one step at a time.
@@ -19,6 +21,10 @@ messages. You send every message by hand from your own LinkedIn, and every agent
 step at the two places that matter: the connection request, and the send. Between those two points the
 machine does the reading, the writing, the arithmetic and the remembering, so nothing goes quiet and
 no follow-up date lives in your head.
+
+This is the **GenTeam (Genspark) Edition** of God's L'Eye — the build on one Google Sheet and five
+agents, and the one this pack installs. The earlier build runs on a different stack and is not what is
+in these files; nothing here needs it.
 
 ---
 

@@ -1,5 +1,7 @@
 # God's L'Eye — six clicks on stage
 
+*God's L'Eye — GenTeam (Genspark) Edition*
+
 For you, on demo day. Every click you make, the sentence you say while you make it, and what to do
 if it does not do what it should. Read the fallback line at the bottom once before you start.
 

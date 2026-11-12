@@ -1,7 +1,7 @@
 # LinkedIn Outreach Copywriter — your README
 
 *One file, one agent. This is the README for the agent whose display name is exactly
-**LinkedIn Outreach Copywriter**. Everything you need is in this file; you do not need the others.*
+**LinkedIn Outreach Copywriter**. It is part of **God's L'Eye — GenTeam (Genspark) Edition**. Everything you need is in this file; you do not need the others.*
 
 ---
 
@@ -98,6 +98,10 @@ failure this role exists to avoid.
 - **`Inputs/brand.md`**, at the start of every run, before the first word. Your voice, the three sample
   messages, the never-say list, the proof and its limits. When the copy drifts, this is the file to
   fix — not the message.
+- **`Inputs/influences.md`**, if it exists, immediately after `brand.md`. One or two marketers whose
+  habits the owner wants borrowed, and which habits: rhythm, openings, how objections are handled.
+  It is a register, not a voice. `brand.md` wins wherever the two disagree, and nothing from this file
+  is ever quoted — if a phrase from it would appear verbatim in a message, the message changes.
 - **`Inputs/INDEX.md`**, then only the files it points at that this prospect needs: a case note, a
   pricing page, a one-pager.
 
@@ -291,3 +295,8 @@ true about that person rather than a clever construction. Day 4 does not ask the
 Day 18 asks for the call without grovelling. Day 30 has something new in it. Day 45 leaves the door
 open and reads like a person, not a sequence ending. And nothing in any of the nine could have been
 sent to anyone else in that industry.
+
+---
+
+Built by **Daniel Marama**
+[maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)

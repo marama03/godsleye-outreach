@@ -1,4 +1,4 @@
-# Campaign Tracker — broadcast demo
+# God’s L’Eye — GenTeam (Genspark) Edition: dashboard
 
 A standalone demo of a LinkedIn-prospecting tracker. It reads and writes **local JSON files only**.
 No LinkedIn automation, no browser automation, no scheduler, no outbound HTTP, no telemetry,
