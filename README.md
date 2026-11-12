@@ -1,6 +1,8 @@
-# God's L'Eye — GenTeam (Genspark) Edition
+# God's L'Eye: LinkedIn Automation Tool for Outreach (Google Sheets + AI Agents)
 
-God's L'Eye — GenTeam (Genspark) Edition is a Google Sheet and five narrow agents for LinkedIn outreach you send by hand.
+**God's L'Eye is an open-source LinkedIn automation tool that automates the work around LinkedIn outreach, and leaves the sending to you.** It is a Google Sheet, a mobile-friendly dashboard and five AI agents that handle LinkedIn prospecting, lead research, prioritization and message writing, with a follow-up cadence built in. You send every connection request and message yourself, from your own account, so there is no bot, no browser automation and no scraping of your session. Because a person sends, it stays clear of the automated-activity behavior that LinkedIn's rules restrict (check LinkedIn's current terms for your own situation).
+
+**Keywords people search for, and what this does about each:** LinkedIn automation (research, drafting and tracking are automated), LinkedIn outreach tool, LinkedIn prospecting, LinkedIn lead generation, LinkedIn CRM and pipeline tracker, LinkedIn message templates and follow-up sequences, AI sales agents, cold outreach on LinkedIn without a bot, a Google Sheets CRM, and an alternative to Expandi, Dux-Soup and Waalaxy for people who want a human sending.
 
 You describe the buyer. The agents find prospects, research everyone who accepts, decide who is worth
 your time, and write the messages. You send every message yourself, from your own LinkedIn. Nothing in

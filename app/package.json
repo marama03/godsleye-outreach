@@ -2,7 +2,8 @@
   "name": "godsleye-genteam-edition",
   "version": "1.0.0",
   "private": true,
-  "description": "God’s L’Eye — GenTeam (Genspark) Edition: a LinkedIn-prospecting tracker dashboard. Local JSON files only. No network at runtime.",
+  "description": "God’s L’Eye: open-source LinkedIn automation tool for outreach. AI agents do prospecting and research, you send by hand. Google Sheets + mobile dashboard.",
+  "keywords": ["linkedin-automation", "linkedin-outreach", "linkedin-prospecting", "lead-generation", "sales-automation", "ai-agents", "google-sheets", "crm", "cold-outreach"],
   "type": "module",
   "scripts": {
     "dev": "concurrently -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
