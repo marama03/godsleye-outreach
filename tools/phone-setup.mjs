@@ -4,6 +4,7 @@
 //
 //   node tools/phone-setup.mjs              check everything, create the address, verify it, print the link
 //   node tools/phone-setup.mjs --install    also install Tailscale (winget / brew) when it is missing
+//   node tools/phone-setup.mjs --check      change nothing; test the whole chain and say which link is broken
 //   node tools/phone-setup.mjs --off        remove the address again
 //   Options: --port 8787 (the dashboard, default 8787)   --https 8446 (the public-facing tailnet port)
 //
@@ -93,6 +94,7 @@ const used = new Set(Object.keys(serveJson.Web ?? {}).map((k) => Number(k.split(
 const target = `http://127.0.0.1:${APP_PORT}`;
 const existing = serveJson.Web?.[`${dns}:${HTTPS_PORT}`]?.Handlers?.["/"]?.Proxy;
 if (!(existing && existing.replace(/\/$/, "") === target)) {
+  if (has("check")) fail(1, `[!!] The private address is not set up for this dashboard (expected ${dns}:${HTTPS_PORT} -> ${target}). Run this without --check to create it.`);
   let tries = 0;
   while (used.has(HTTPS_PORT) && tries++ < 10) HTTPS_PORT++;
   const r = run(TS, ["serve", "--bg", `--https=${HTTPS_PORT}`, target]);
