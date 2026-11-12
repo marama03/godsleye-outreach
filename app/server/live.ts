@@ -6,7 +6,7 @@ import path from "node:path";
 import type { Express, Request, Response } from "express";
 import { DATA_DIR, DOSSIER_DIR } from "./store.js";
 
-const WATCHED = ["campaigns.json", "chains.json", "leads.json", "events.json"];
+const WATCHED = ["campaigns.json", "chains.json", "leads.json", "events.json", "config.json"];
 
 async function signature(): Promise<string> {
   const parts: string[] = [];

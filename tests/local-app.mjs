@@ -145,6 +145,54 @@ try {
   check("today's queue is identical after a restart", JSON.stringify(await get(`/api/today?campaign=${cid}`)) === before);
   const s4 = await post("/api/events", { campaign_id: cid, lead_id: ada.lead_id, kind: "sent", step: 1, body_text: ada.body, idempotency_key: "t-sent-ada-2" });
   check("idempotency keys survive a restart (replayed click is a no-op)", s4.status === 200 && s4.body.duplicate === true, s4);
+  // 8. replies, answers, booked calls, scorecard, stale invites
+  {
+    const cur = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8"));
+    const old = { ...mk("Old Invite", "ol0000000005"), accepted_at: null, invited_at: iso(-120) };
+    writeFileSync(join(DATA, "leads.json"), JSON.stringify([...cur, old, mk("Eve", "ev0000000006"), mk("Flo", "fl0000000007")], null, 2));
+    const wd = async () => get(`/api/workday?campaign=${cid}`);
+    let w = await wd();
+    check("a 120-day-old invite is listed under 90+ days", w.stale_invites.some((p) => p.name === "Old Invite" && p.days_invited >= 119), w.stale_invites);
+    await post("/api/events", { campaign_id: cid, lead_id: "ol0000000005", kind: "withdrawn", idempotency_key: "t-wd-1" });
+    w = await wd();
+    check("withdrawn invite leaves the 90+ list", !w.stale_invites.some((p) => p.name === "Old Invite"));
+    await post("/api/events", { campaign_id: cid, lead_id: "ev0000000006", kind: "replied", idempotency_key: "t-rep-eve" });
+    await post("/api/events", { campaign_id: cid, lead_id: "fl0000000007", kind: "replied", idempotency_key: "t-rep-flo" });
+    w = await wd();
+    check("replied leads show as waiting on you", ["Eve", "Flo"].every((n) => w.waiting_on_you.some((r) => r.name === n)), w.waiting_on_you.map((r) => r.name));
+    const ans = await post("/api/events", { campaign_id: cid, lead_id: "ev0000000006", kind: "sent", payload: { answered: true }, idempotency_key: "t-ans-eve" });
+    w = await wd();
+    check("I answered clears the lead from waiting", !w.waiting_on_you.some((r) => r.name === "Eve") && w.waiting_on_you.some((r) => r.name === "Flo"));
+    await post(`/api/undo/${ans.body.event.event_id}`, {});
+    w = await wd();
+    check("undoing the answer puts the lead back", w.waiting_on_you.some((r) => r.name === "Eve"));
+    await post("/api/events", { campaign_id: cid, lead_id: "fl0000000007", kind: "sent", payload: { answered: true, booked: true }, idempotency_key: "t-book-flo" });
+    w = await wd();
+    const led2 = await get(`/api/ledger?campaign=${cid}`);
+    const flo = (led2.leads ?? []).find((l) => l.name === "Flo");
+    check("Call booked clears waiting and sets stage booked", !w.waiting_on_you.some((r) => r.name === "Flo") && flo && flo.stage === "booked", flo && flo.stage);
+    const all = w.scorecard.all;
+    check("scorecard counts the funnel (5 invited, 4 accepted, 1 messaged, 2 replied, 1 booked)", all.invited === 5 && all.accepted === 4 && all.messaged === 1 && all.replied === 2 && all.booked === 1, all);
+    check("scorecard 7-day range is a subset of all time", Object.keys(all).every((k) => w.scorecard["7"][k] <= all[k]), w.scorecard["7"]);
+  }
+
+  // 9. the sheet-link strip: config.json is the one place the dashboard keeps its sheet link
+  {
+    check("not connected before a link is given", (await get("/api/config")).connected === false);
+    const bad = await post("/api/config", { sheet_url: "https://example.com/not-a-sheet" });
+    check("a non-sheet link is refused", bad.status === 400, bad);
+    const url = "https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789/edit";
+    const ok = await post("/api/config", { sheet_url: url });
+    check("a Google Sheets link is saved", ok.status === 200 && ok.body.connected === true, ok);
+    const cfg = await get("/api/config");
+    check("config reports the link and a connected time", cfg.connected && cfg.sheet_url === url && !!cfg.connected_at, cfg);
+    writeFileSync(join(DATA, "config.json"), JSON.stringify({ sheet_url: url, sheet_title: "Pipeline", connected_at: cfg.connected_at, last_synced_at: "2026-11-12T12:03:00Z" }));
+    const cfg2 = await get("/api/config");
+    check("an agent's edit to config.json is read (title, last synced)", cfg2.sheet_title === "Pipeline" && cfg2.last_synced_at === "2026-11-12T12:03:00Z", cfg2);
+    const off = await post("/api/config", { sheet_url: "" });
+    check("clearing the link disconnects", off.status === 200 && (await get("/api/config")).connected === false);
+  }
+
   const files = ["campaigns.json", "leads.json", "events.json"].every((f) => { try { JSON.parse(readFileSync(join(DATA, f), "utf8")); return true; } catch { return false; } });
   check("data files are valid JSON on disk", files);
 } catch (e) {

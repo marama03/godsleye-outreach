@@ -4,7 +4,8 @@ import { DATA_DIR } from "./store.js";
 const PORT = Number(process.env.PORT ?? 8787);
 const app = createApp();
 
-const srv = app.listen(PORT, "127.0.0.1", () => {
+const HOST = process.env.HOST ?? "127.0.0.1"; // set HOST=0.0.0.0 only to serve a phone straight from `npm start`
+const srv = app.listen(PORT, HOST, () => {
   console.log(`[server] API listening on http://127.0.0.1:${PORT}  (data: ${DATA_DIR})`);
 });
 srv.on("error", (err: NodeJS.ErrnoException) => {

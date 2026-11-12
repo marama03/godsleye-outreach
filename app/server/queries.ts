@@ -248,6 +248,33 @@ function personRow(l: Lead): PersonRow {
   };
 }
 
+export interface ScoreRange { invited: number; accepted: number; messaged: number; replied: number; booked: number }
+
+/** Funnel counts for the last 7, 14, 30 days and all time, computed from the ledger and lead facts (nothing stored). */
+function scorecard(db: Db, c: Campaign, today: string): Record<"7" | "14" | "30" | "all", ScoreRange> {
+  const live = liveEvents(campaignEvents(db, c.id));
+  const leads = campaignLeads(db, c.id);
+  const firstTs = (leadId: string, kinds: string[], pred?: (e: LedgerEvent) => boolean) =>
+    live.filter((e) => e.lead_id === leadId && kinds.includes(e.kind) && (!pred || pred(e))).map((e) => e.ts_utc).sort()[0] ?? null;
+  const rows = leads.map((l) => {
+    const inv = [l.invited_at, firstTs(l.lead_id, ["invite_sent"])].filter(Boolean).sort()[0] ?? null;
+    const acc = [l.accepted_at, firstTs(l.lead_id, ["accepted"])].filter(Boolean).sort()[0] ?? null;
+    const msg = firstTs(l.lead_id, ["sent"], (e) => e.step !== null);
+    const rep = firstTs(l.lead_id, ["replied"]);
+    const book = firstTs(l.lead_id, ["replied", "sent"], (e) => e.payload?.["booked"] === true);
+    return { inv, acc, msg, rep, book };
+  });
+  const within = (iso: string | null, days: number | null) => !!iso && (days === null || diffDays(ymdFromIso(iso), today) <= days - 1);
+  const mk = (days: number | null): ScoreRange => ({
+    invited: rows.filter((r) => within(r.inv, days)).length,
+    accepted: rows.filter((r) => within(r.acc, days)).length,
+    messaged: rows.filter((r) => within(r.msg, days)).length,
+    replied: rows.filter((r) => within(r.rep, days)).length,
+    booked: rows.filter((r) => within(r.book, days)).length,
+  });
+  return { "7": mk(7), "14": mk(14), "30": mk(30), all: mk(null) };
+}
+
 /** Everything the one-screen Today needs. Accepted leads without a dossier wait in `researching`, not in `cards`. */
 export function workday(db: Db, c: Campaign, today: string) {
   const t = todayQueue(db, c, today);
@@ -264,6 +291,11 @@ export function workday(db: Db, c: Campaign, today: string) {
     awaiting,
     researching,
     invited_today: invitedToday,
+    stale_invites: awaiting
+      .map((p) => ({ ...p, days_invited: p.invited_at ? diffDays(ymdFromIso(p.invited_at), today) : 0 }))
+      .filter((p) => p.days_invited >= 90)
+      .sort((a, b) => b.days_invited - a.days_invited),
+    scorecard: scorecard(db, c, today),
     campaign: { id: c.id, name: c.name, icp_sentence: c.icp_sentence },
   };
 }

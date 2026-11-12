@@ -52,6 +52,16 @@ The repository is not needed for any of this.
 
 Each one is a decision, not a gap. `docs/godsleye-start-here.md`, section 4, says why.
 
+## Run the dashboard
+
+The dashboard runs on your own computer, where your agent runs. Nothing is hosted, and no account is needed. Pick one:
+
+- **Ask your agent:** "set up the dashboard". It runs `setup-dashboard.sh` (clone, install, start; safe to run again to update; needs Node 20 or newer and git). An agent should run it with `--no-start` and start the app in the background.
+- **Double-click:** `start.command` on a Mac, `start.bat` on Windows, or `./start.sh`. It checks Node, installs once, starts the app and opens the browser.
+- **By hand:** `cd app`, `npm install`, `npm run dev`, then open http://127.0.0.1:5173.
+
+Connect your sheet by pasting its link into the strip at the top of Today, or by giving it to the Scout. Your data lives in `app/data/`, which stays on your computer and is never overwritten by an update.
+
 ## What is in here
 
 - `docs/` — the manual, the demo script, the operator checklist, the five agent READMEs.
@@ -59,6 +69,7 @@ Each one is a decision, not a gap. `docs/godsleye-start-here.md`, section 4, say
   part of the setup, and a sheet wired to it must not also be swept by the Tracker: two writers on one
   row is the one thing this design refuses. Section 6 of the manual explains when it is worth having.
 - `app/` — the dashboard: Today, the row cards, the send and undo path.
+- `start.command`, `start.bat`, `start.sh`, `setup-dashboard.sh` — the launchers described above.
 - `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). `node tests/local-app.mjs` runs 22 checks on the dashboard's local store (needs `npm install` in `app/`): sent, skip, undo, double-click and restart, with no sheet or token. None of the three touches a real sheet; none of them needs a Google credential.
 
 ## Status

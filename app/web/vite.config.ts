@@ -13,6 +13,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    host: true, // reachable from a phone on the same wifi; the API stays on localhost behind the proxy
     proxy: { "/api": { target: `http://127.0.0.1:${API_PORT}`, changeOrigin: false } },
   },
   build: { outDir: path.join(root, "dist"), emptyOutDir: true },

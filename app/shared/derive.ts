@@ -39,7 +39,7 @@ export function deriveLeadState(
   const accepted = !!lead.accepted_at || mine.some((e) => e.kind === "accepted");
   const withdrawn =
     !!lead.withdrawn_at || mine.some((e) => e.kind === "withdrawn" || e.kind === "not_a_fit");
-  const booked = mine.some((e) => e.kind === "replied" && e.payload?.["booked"] === true);
+  const booked = mine.some((e) => (e.kind === "replied" || e.kind === "sent") && e.payload?.["booked"] === true);
   const replied = !!lastReply;
 
   // waiting_on_me: last event is a reply with no "sent" after it

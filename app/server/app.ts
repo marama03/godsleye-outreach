@@ -4,6 +4,8 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import {
   loadDb,
+  loadConfig,
+  saveConfig,
   withLock,
   saveCampaigns,
   saveEvents,
@@ -279,6 +281,31 @@ export function createApp() {
     const md = await readDossier(rel);
     if (md == null) return bad(res, "dossier not found", 404);
     res.type("text/markdown").send(md);
+  }));
+
+  // Which sheet is this dashboard paired with? An agent keeps data/config.json; the owner may also paste the link here.
+  app.get("/api/config", asyncRoute(async (_req, res) => {
+    const c = await loadConfig();
+    res.json({ connected: !!c.sheet_url, sheet_url: c.sheet_url ?? null, sheet_title: c.sheet_title ?? null, connected_at: c.connected_at ?? null, last_synced_at: c.last_synced_at ?? null });
+  }));
+
+  app.post("/api/config", asyncRoute(async (req, res) => {
+    const url = String(req.body?.sheet_url ?? "").trim();
+    if (url === "") {
+      await withLock(async () => { const c = await loadConfig(); delete c.sheet_url; delete c.sheet_title; delete c.connected_at; delete c.last_synced_at; await saveConfig(c); });
+      return res.json({ ok: true, connected: false });
+    }
+    if (!/^https:\/\/docs\.google\.com\/spreadsheets\/d\/[A-Za-z0-9_-]{20,}/.test(url)) return bad(res, "that does not look like a Google Sheets link (https://docs.google.com/spreadsheets/d/...)");
+    const title = String(req.body?.sheet_title ?? "").trim().slice(0, 120);
+    await withLock(async () => {
+      const c = await loadConfig();
+      const changed = c.sheet_url !== url;
+      c.sheet_url = url;
+      if (title) c.sheet_title = title;
+      if (changed) { c.connected_at = new Date().toISOString(); delete c.last_synced_at; }
+      await saveConfig(c);
+    });
+    res.json({ ok: true, connected: true });
   }));
 
   app.get("/api/sheet/status", (_req, res) => {

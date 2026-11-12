@@ -17,6 +17,7 @@ export const FILES = {
   chains: path.join(DATA_DIR, "chains.json"),
   leads: path.join(DATA_DIR, "leads.json"),
   events: path.join(DATA_DIR, "events.json"),
+  config: path.join(DATA_DIR, "config.json"),
 } as const;
 
 export interface Db {
@@ -73,6 +74,18 @@ async function persistTouched(): Promise<void> {
   const tmp = `${TOUCHED_LOG}.tmp`;
   await fs.writeFile(tmp, JSON.stringify(touchedPaths(), null, 2) + "\n", "utf8");
   await fs.rename(tmp, TOUCHED_LOG);
+}
+
+export interface ConfigFile { sheet_url?: string; sheet_title?: string; connected_at?: string; last_synced_at?: string }
+
+/** The connection note an agent (or the owner, from the dashboard) keeps in data/config.json. Never holds a credential. */
+export async function loadConfig(): Promise<ConfigFile> {
+  await ensureDirs();
+  const c = await readJson<ConfigFile>(FILES.config, {});
+  return c && typeof c === "object" ? c : {};
+}
+export async function saveConfig(c: ConfigFile): Promise<void> {
+  await atomicWrite(FILES.config, c);
 }
 
 export async function loadDb(): Promise<Db> {

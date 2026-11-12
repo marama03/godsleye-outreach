@@ -45,6 +45,10 @@ export default function Workday() {
   const [busy, setBusy] = useState<Set<string>>(new Set());
   const [last, setLast] = useState<{ label: string; name: string; contact_id: string; stage_after: string } | null>(null);
   const [sheetRows, setSheetRows] = useState<SheetDueRow[] | null>(null);
+  const [conn, setConn] = useState<Awaited<ReturnType<typeof api.config>> | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [urlDraft, setUrlDraft] = useState("");
+  const [range, setRange] = useState<"7" | "14" | "30" | "all">(() => (localStorage.getItem("tracker.scoreRange") as "7" | "14" | "30" | "all") || "30");
   const [edits, setEdits] = useState<Record<string, string>>({}); // "<contact>:<variant>" -> edited text
   const dateParam = () => new URLSearchParams(window.location.search).get("date") ?? undefined;
 
@@ -76,7 +80,9 @@ export default function Workday() {
   }, [sheetOn, loadSheet]);
 
   // the screen follows the data folder; there is no refresh button
-  useLive(() => { load(); if (sheetOn) loadSheet(); });
+  const loadConn = useCallback(() => api.config().then(setConn).catch(() => undefined), []);
+  useEffect(() => { loadConn(); }, [loadConn]);
+  useLive(() => { load(); loadConn(); if (sheetOn) loadSheet(); });
 
   const sync = useCallback(async () => {
     if (!active) return;
@@ -101,6 +107,7 @@ export default function Workday() {
     const dueCount = sheetOn ? sheetRows?.length ?? 0 : data.cards.length;
     side.set({
       sections: [
+        { id: "waiting", label: "Waiting on you", count: data.waiting_on_you.length },
         { id: "due", label: "Messages due", count: dueCount },
         { id: "researching", label: "Researching", count: data.researching.length },
         { id: "accept", label: "Did they accept?", count: data.awaiting.length },
@@ -113,12 +120,12 @@ export default function Workday() {
   }, [data, sheetOn, sync, sheetRows]);
   useEffect(() => () => side.set({ sections: [], meter: null, refresh: null, sync: null }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function post(lead_id: string, kind: "invite_sent" | "accepted" | CardExit, step?: number, body?: string, doneText?: string) {
+  async function post(lead_id: string, kind: "invite_sent" | "accepted" | "withdrawn" | CardExit, step?: number, body?: string, doneText?: string, payload?: Record<string, unknown>) {
     if (!active) return;
-    const k = `${lead_id}:${step ?? 0}:${kind}`;
+    const k = `${lead_id}:${step ?? 0}:${kind}${payload?.booked ? ":booked" : ""}`;
     if (!keys.current.has(k)) keys.current.set(k, newIdempotencyKey());
     try {
-      const out = await api.postEvent({ campaign_id: active.id, lead_id, kind, step, body_text: body, idempotency_key: keys.current.get(k)! });
+      const out = await api.postEvent({ campaign_id: active.id, lead_id, kind, step, body_text: body, payload, idempotency_key: keys.current.get(k)! });
       if (out.duplicate) {
         toast.show({ text: "Already logged. One row, not two.", ttlMs: 2500 });
       } else {
@@ -243,12 +250,79 @@ export default function Workday() {
           </div>
 
           <div className="mt-3 rounded-xl border border-brand-border bg-brand-card px-3.5 py-3 text-sm">
-            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-brand-accent align-middle" aria-hidden />
-            {sheetOn
-              ? syncedAt ? `Synced with your Google Sheet at ${syncedAt.toLocaleTimeString()}.` : "Google Sheet connected. Press Sync sheet to pull new accepts and dossiers."
-              : "Running on local files. Connect a Google Sheet to let the research agent pick up accepted prospects."}
-            {" "}Sending on LinkedIn stays manual; this screen only records it.
+            <span className={`mr-1.5 inline-block h-2 w-2 rounded-full align-middle ${conn?.connected ? "bg-green-500" : "bg-brand-accent"}`} aria-hidden />
+            {conn?.connected ? (
+              <>
+                Connected: <a className="font-semibold underline" href={conn.sheet_url ?? "#"} target="_blank" rel="noreferrer">{conn.sheet_title ?? "your sheet"}</a>
+                {conn.last_synced_at ? ` · last synced ${new Date(conn.last_synced_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}` : " · not synced yet"}
+              </>
+            ) : (
+              <>Not connected to a sheet. Paste its link below, or give it to the Scout.</>
+            )}
+            {" "}
+            <button className="btn-link" onClick={() => { setUrlDraft(conn?.sheet_url ?? ""); setEditing((e) => !e); }}>{conn?.connected ? "Change" : "Add sheet link"}</button>
+            {editing && (
+              <form className="mt-2 flex flex-wrap items-center gap-2" onSubmit={async (e) => {
+                e.preventDefault();
+                try { await api.setSheetUrl(urlDraft.trim()); setEditing(false); await loadConn(); toast.show({ text: urlDraft.trim() ? "Sheet link saved" : "Sheet link removed", ttlMs: 2500 }); }
+                catch (err: any) { toast.show({ text: err.message ?? String(err), ttlMs: 4000 }); }
+              }}>
+                <input className="input min-w-0 flex-1" placeholder="https://docs.google.com/spreadsheets/d/…" value={urlDraft} onChange={(e) => setUrlDraft(e.target.value)} aria-label="Sheet link" />
+                <button className="btn-primary" type="submit">Save</button>
+              </form>
+            )}
+            <span className="mt-1 block text-xs text-brand-muted">The dashboard only stores the link. Your agent does the reading and writing, and sending on LinkedIn stays manual.</span>
           </div>
+
+          {(() => {
+            const sc = data.scorecard[range];
+            const pct = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 100)}%` : "–");
+            const tiles: [string, number, string][] = [
+              ["Invited", sc.invited, ""],
+              ["Accepted", sc.accepted, `${pct(sc.accepted, sc.invited)} of invited`],
+              ["Messaged", sc.messaged, `${pct(sc.messaged, sc.accepted)} of accepted`],
+              ["Replied", sc.replied, `${pct(sc.replied, sc.messaged)} of messaged`],
+              ["Call booked", sc.booked, `${pct(sc.booked, sc.replied)} of replies`],
+            ];
+            return (
+              <Section id="score" title="Scorecard" count={range === "all" ? "all time" : `${range} days`}>
+                <div className="mb-2 flex gap-1.5" role="group" aria-label="Range">
+                  {(["7", "14", "30", "all"] as const).map((r) => (
+                    <button key={r} aria-pressed={range === r} className={range === r ? "btn-primary" : "btn-secondary"} onClick={() => { setRange(r); localStorage.setItem("tracker.scoreRange", r); }}>{r === "all" ? "All" : `${r} days`}</button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-5">
+                  {tiles.map(([label, n, sub]) => (
+                    <div key={label} className="card px-3 py-3">
+                      <div className="font-display text-3xl font-black leading-none">{n}</div>
+                      <div className="mt-1 text-sm font-semibold">{label}</div>
+                      <div className="text-xs text-brand-muted">{sub || " "}</div>
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            );
+          })()}
+
+          <Section id="waiting" title="They replied, waiting on you" count={data.waiting_on_you.length}>
+            {data.waiting_on_you.length === 0 ? <Empty>Nobody is waiting on an answer.</Empty> : (
+              <div className="card p-4">
+                {data.waiting_on_you.map((wr) => (
+                  <div key={wr.lead_id} className={`grid grid-cols-1 items-center gap-2 border-t border-brand-border py-2.5 first:border-t-0 sm:grid-cols-[1fr_auto] ${leaving.has(wr.lead_id) ? "opacity-40" : ""}`}>
+                    <div>
+                      <b>{wr.name}</b>
+                      <span className="block text-sm text-brand-muted">{wr.company} · replied {wr.days_waiting === 0 ? "today" : `${wr.days_waiting} day${wr.days_waiting === 1 ? "" : "s"} ago`}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button className="btn-primary" onClick={() => post(wr.lead_id, "sent", undefined, undefined, `Answer logged · ${wr.name}`, { answered: true })}>I answered</button>
+                      <button className="btn-secondary" onClick={() => post(wr.lead_id, "sent", undefined, undefined, `Call booked · ${wr.name}`, { answered: true, booked: true })}>Call booked</button>
+                      <button className="btn-ghost" onClick={() => post(wr.lead_id, "not_a_fit", undefined, undefined, `Marked not a fit · ${wr.name}`)}>Not a fit</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Section>
 
           <Section id="due" title="Messages due" count={dueNow}>
             {sheetOn && last ? (
@@ -315,6 +389,21 @@ export default function Workday() {
               </div>
             )}
           </Section>
+
+          {data.stale_invites.length > 0 && (
+            <Section id="stale" title="Invites waiting 90+ days" count={data.stale_invites.length}>
+              <div className="card p-4">
+                <p className="mb-2 text-sm text-brand-muted">These never accepted. Withdraw each on LinkedIn (Manage invitations → Sent), then tell the dashboard so it stops tracking them.</p>
+                <button className="btn-secondary mb-2" onClick={async () => { for (const p of data.stale_invites) await post(p.lead_id, "withdrawn", undefined, undefined, `Withdrawn · ${p.name}`); }}>I withdrew all {data.stale_invites.length}</button>
+                {data.stale_invites.map((p) => personRow(p, (
+                  <>
+                    {profile(p)}
+                    <button className="btn-primary" onClick={() => post(p.lead_id, "withdrawn", undefined, undefined, `Withdrawn · ${p.name}`)}>I withdrew it</button>
+                  </>
+                ), `invited ${p.days_invited} days ago`))}
+              </div>
+            </Section>
+          )}
 
           <Section id="invite" title="New people to invite" count={data.to_invite.length}>
             {data.to_invite.length === 0 ? <Empty>No new prospects. The Scout adds them to your sheet.</Empty> : data.to_invite.map((p) => (

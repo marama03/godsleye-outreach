@@ -85,6 +85,8 @@ export interface WorkdayResponse extends TodayResponse {
   awaiting: PersonRow[];
   researching: PersonRow[];
   invited_today: number;
+  stale_invites: (PersonRow & { days_invited: number })[];
+  scorecard: Record<"7" | "14" | "30" | "all", { invited: number; accepted: number; messaged: number; replied: number; booked: number }>;
   campaign: { id: string; name: string; icp_sentence: string };
 }
 
@@ -170,6 +172,9 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ action: "variants", contact_id: body.contact_id, stage: body.stage, variants: [{ slot: body.slot, body: body.text, stage: body.stage }] }),
     }).then(j<{ ok: boolean; error?: string; variants?: string[] }>),
+  config: () => fetch("/api/config").then(j<{ connected: boolean; sheet_url: string | null; sheet_title: string | null; connected_at: string | null; last_synced_at: string | null }>),
+  setSheetUrl: (sheet_url: string) =>
+    fetch("/api/config", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sheet_url }) }).then(j<{ ok: boolean; connected: boolean }>),
   sheetStatus: () => fetch("/api/sheet/status").then(j<{ configured: boolean }>),
   scout: (campaign: string) =>
     fetch(`/api/scout?campaign=${encodeURIComponent(campaign)}`).then(j<{ campaign_id: string; icp_sentence: string; rows: ScoutRow[] }>),
