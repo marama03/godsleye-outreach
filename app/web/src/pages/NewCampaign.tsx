@@ -78,7 +78,7 @@ export default function NewCampaign() {
             placeholder="Seed-to-Series-A B2B founders who still run marketing themselves…"
           />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label className="label" htmlFor="chain">Chain @ version</label>
             <select id="chain" className="input" value={chainKey} onChange={(e) => setChainKey(e.target.value)} required>
@@ -98,10 +98,12 @@ export default function NewCampaign() {
           </div>
         </div>
         {err && <p className="rounded-md border border-brand-danger bg-brand-danger-soft px-3 py-2 text-sm text-brand-danger">{err}</p>}
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-brand-muted">Create writes one campaign row and one <code className="font-mono">campaign_created</code> event. Nothing else.</p>
-          <button className="btn-primary" disabled={busy || !selected}>{busy ? "Creating…" : "Create campaign"}</button>
-          <button type="button" className="btn-link ml-3" onClick={async () => { try { const r = await api.loadDemo(); setActiveId(r.campaign_id); await refresh(); nav("/today"); } catch (e: any) { setErr(String(e.message ?? e)); } }}>or load the demo</button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <p className="text-xs text-brand-muted sm:max-w-xs">Create writes one campaign row and one <code className="font-mono">campaign_created</code> event. Nothing else.</p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <button className="btn-primary w-full sm:w-auto" disabled={busy || !selected}>{busy ? "Creating…" : "Create campaign"}</button>
+          <button type="button" className="btn-secondary w-full sm:w-auto" onClick={async () => { try { const r = await api.loadDemo(); setActiveId(r.campaign_id); await refresh(); nav("/today"); } catch (e: any) { setErr(String(e.message ?? e)); } }}>Load the demo instead</button>
+          </div>
         </div>
       </form>
     </div>

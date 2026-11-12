@@ -59,6 +59,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           aria-label="Sections"
           className={`fixed left-0 top-0 z-30 flex h-screen w-60 shrink-0 flex-col gap-3.5 bg-brand-navy px-4 py-5 text-brand-on-navy shadow-2xl transition-all lg:sticky lg:translate-x-0 lg:shadow-none ${collapsed ? "lg:w-[72px] lg:px-2" : ""} ${open ? "translate-x-0" : "-translate-x-full"}`}
         >
+          <button className="absolute right-3 top-3 rounded-full bg-white/10 px-2.5 py-1 text-sm text-white/80 lg:hidden" onClick={() => setOpen(false)} aria-label="Close sections">✕</button>
           <Link to="/today" title="God’s L’Eye" className={`flex items-center gap-2.5 font-display text-lg font-extrabold ${collapsed ? "lg:justify-center" : ""}`}>
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-brand-accent text-sm text-brand-on-accent" aria-hidden>👁</span>
             <span className={`flex flex-col leading-tight ${hide}`}>God’s L’Eye<span className="text-[10px] font-semibold opacity-70">GenTeam (Genspark) Edition</span></span>
@@ -72,6 +73,11 @@ export default function Shell({ children }: { children: ReactNode }) {
           )}
 
           <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
+            <NavLink to="/today" title="Today" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>📅</span><span className={hide}>Today</span></span></NavLink>
+            <NavLink to="/campaigns" end title="Campaigns" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>🗂</span><span className={hide}>Campaigns</span></span></NavLink>
+            <NavLink to="/scout" title="Scout" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>🔭</span><span className={hide}>Scout</span></span></NavLink>
+            <NavLink to="/ledger" title="Ledger" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>📒</span><span className={hide}>Ledger</span></span></NavLink>
+            {value.sections.length > 0 && <div className="mt-3 border-t border-white/10 pt-3 text-[10px] font-bold uppercase tracking-wider text-white/40"><span className={hide}>On this page</span></div>}
             {value.sections.map((s) => (
               <button key={s.id} onClick={() => jump(s.id)} title={`${s.label} (${s.count})`} className={`flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-white/75 hover:bg-white/10 hover:text-white ${collapsed ? "lg:flex-col lg:gap-0.5 lg:px-1" : ""}`}>
                 <span className="flex items-center gap-2"><span aria-hidden className={collapsed ? "" : "lg:hidden"}>{ICON[s.id] ?? "•"}</span><span className={hide}>{s.label}</span></span>
@@ -79,9 +85,7 @@ export default function Shell({ children }: { children: ReactNode }) {
               </button>
             ))}
             <div className="mt-3 border-t border-white/10 pt-3" />
-            <NavLink to="/ledger" title="Ledger" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>📒</span><span className={hide}>Ledger</span></span></NavLink>
             {activeId && <NavLink to={`/campaigns/${activeId}`} title="Campaign settings and delete" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>⚙</span><span className={hide}>Manage campaign</span></span></NavLink>}
-            <NavLink to="/campaigns/new" title="New campaign" className={link} onClick={() => setOpen(false)}><span><span aria-hidden className={collapsed ? "" : "lg:hidden"}>✚</span><span className={hide}>New campaign</span></span></NavLink>
           </nav>
 
           {value.meter && (

@@ -6,7 +6,7 @@ import { useCampaign } from "../lib/campaign-context";
 function Counter({ label, value, to }: { label: string; value: number; to?: string }) {
   const inner = (
     <div className="card flex flex-col items-start p-5">
-      <span className="text-5xl font-bold tabular-nums tracking-tight">{value}</span>
+      <span className="text-4xl font-bold sm:text-5xl tabular-nums tracking-tight">{value}</span>
       <span className="mt-2 text-sm font-medium text-brand-muted">{label}</span>
     </div>
   );
@@ -93,29 +93,29 @@ export default function CampaignHome() {
           Created. One campaign row, one <code className="font-mono">campaign_created</code> event.
         </div>
       )}
-      <div className="card p-6">
-        <div className="flex items-start justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3">
+      <div className="card p-4 sm:p-6">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:gap-6">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h1 className="text-2xl font-bold tracking-tight">{c.name}</h1>
               <span className={`pill ${c.status === "active" ? "bg-brand-ok-soft text-brand-ok" : "bg-brand-surface text-brand-ink"}`}>{c.status}</span>
             </div>
             <p className="mt-2 max-w-2xl text-brand-ink">{c.icp_sentence}</p>
-            <dl className="mt-4 grid grid-cols-3 gap-x-8 gap-y-2 text-sm">
+            <dl className="mt-4 grid grid-cols-1 gap-y-2 text-sm sm:grid-cols-3 sm:gap-x-8">
               <div><dt className="label">Chain</dt><dd className="font-mono">{data.chain_key}</dd></div>
               <div><dt className="label">Start date</dt><dd>{fmtWeekdayDate(c.start_date)}</dd></div>
               <div><dt className="label">Daily cap</dt><dd>{c.daily_cap} cards</dd></div>
             </dl>
           </div>
-          <div className="shrink-0 text-right">
+          <div className="w-full min-w-0 sm:w-auto sm:max-w-[16rem] sm:shrink-0 sm:text-right">
             <span className="label">campaign_id</span>
-            <code className="block rounded-md border border-brand-border bg-brand-surface px-3 py-2 font-mono text-base font-semibold">{c.id}</code>
+            <code title="Tap to copy" onClick={() => navigator.clipboard?.writeText(c.id)} className="block cursor-pointer truncate rounded-md border border-brand-border bg-brand-surface px-3 py-2 font-mono text-sm font-semibold">{c.id}</code>
             <p className="mt-1 text-xs text-brand-muted">stamped on every lead and event</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-4 gap-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         <Counter label="Invites sent" value={data.counters.invited} to="/scout" />
         <Counter label="Accepted" value={data.counters.accepted} />
         <Counter label="Docs ready" value={data.counters.docs_ready} />
@@ -123,8 +123,8 @@ export default function CampaignHome() {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link to="/scout" className="btn-secondary">Open Scout</Link>
         <Link to="/today" className="btn-primary">Open Today</Link>
+        <Link to="/scout" className="btn-secondary">Open Scout</Link>
         <Link to="/ledger" className="btn-ghost">Ledger</Link>
       </div>
       <p className="mt-4 text-xs text-brand-muted">All four counters are computed from the event ledger on every load. None of them is stored.</p>
