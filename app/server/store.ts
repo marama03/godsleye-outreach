@@ -4,7 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Campaign, ChainsFile, Lead, LedgerEvent } from "../shared/types.js";
-import { GTM_V1 } from "../shared/chain-gtm.js";
+import { GTM_V1, GTM_V2 } from "../shared/chain-gtm.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const PROJECT_ROOT = path.resolve(__dirname, "..");
@@ -105,7 +105,7 @@ export async function loadDb(): Promise<Db> {
     readJson<LedgerEvent[]>(FILES.events, []),
   ]);
   // A fresh clone has no chains.json; the built-in chain is always available (a stored one wins).
-  return { campaigns, chains: { "gtm@1": GTM_V1, ...chains }, leads, events };
+  return { campaigns, chains: { "gtm@1": GTM_V1, "gtm@2": GTM_V2, ...chains }, leads, events };
 }
 
 export async function saveCampaigns(rows: Campaign[]): Promise<void> {

@@ -148,7 +148,7 @@ export async function seedDemo(): Promise<{ created: boolean; campaign_id: strin
   const day = (d: number) => iso(d).slice(0, 10);
   const id = campaignIdFor(DEMO_NAME);
   const campaign: Campaign = {
-    id, name: DEMO_NAME, icp_sentence: "Owners of $5M-$50M service businesses", chain_id: "gtm", chain_version: 1,
+    id, name: DEMO_NAME, icp_sentence: "Owners of $5M-$50M service businesses", chain_id: "gtm", chain_version: 2,
     daily_cap: 10, start_date: day(-14), created_at: iso(-14), status: "active",
   };
   const mk = (n: string, u: string, title: string, co: string, o: Partial<Lead> = {}): Lead => ({
@@ -177,7 +177,7 @@ export async function seedDemo(): Promise<{ created: boolean; campaign_id: strin
       idempotency_key: `demo_${lead.lead_id}_${kind}_${daysAgo}_${events.length}`, corrects_event_id: null, payload: null, ...extra,
     });
   };
-  events.push({ event_id: newEventId(), ts_utc: iso(-14), campaign_id: id, lead_id: null, kind: "campaign_created", step: null, variant: null, body_hash: null, idempotency_key: `idk_campaign_${id}`, corrects_event_id: null, payload: { name: DEMO_NAME, chain: "gtm@1", daily_cap: 10, start_date: day(-14) } });
+  events.push({ event_id: newEventId(), ts_utc: iso(-14), campaign_id: id, lead_id: null, kind: "campaign_created", step: null, variant: null, body_hash: null, idempotency_key: `idk_campaign_${id}`, corrects_event_id: null, payload: { name: DEMO_NAME, chain: "gtm@2", daily_cap: 10, start_date: day(-14) } });
   const by = (u: string) => leads.find((l) => l.lead_id === `demo${u}`)!;
   ev(by("d4"), "sent", 4, { step: 1 });
   ev(by("e5"), "sent", 5, { step: 1 });

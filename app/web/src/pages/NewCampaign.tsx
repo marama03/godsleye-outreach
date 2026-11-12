@@ -23,7 +23,7 @@ export default function NewCampaign() {
   useEffect(() => {
     api.chains().then((c) => {
       setChains(c);
-      if (c.length && !chainKey) setChainKey(c[0].key);
+      if (c.length && !chainKey) setChainKey([...c].sort((x, y) => y.version - x.version)[0].key);
     }).catch((e) => setErr(String(e.message ?? e)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

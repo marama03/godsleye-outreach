@@ -1,4 +1,4 @@
-// The gtm@1 chain. 10 steps, offsets 0,3,7,12,18,25,33,42,52,63.
+// The gtm@1 chain. 10 steps, offsets 0,3,7,12,18,25,33,42,52,63. New campaigns use gtm@2 (below).
 // FROZEN once a campaign references it. To change copy, copy to gtm@2 — never edit in place.
 import type { Chain } from "./types.js";
 
@@ -105,4 +105,15 @@ export const GTM_V1: Chain = {
         "Last note from me, {first}. Door's open whenever {company} is ready for a marketing lead. Good luck with the quarter.",
     },
   ],
+};
+
+// gtm@2: the six-send ladder the pitch and the sheet contract describe: Day 0, 4, 10, 18, 30, 45.
+// Same copy as gtm@1 (steps 1-5, then the graceful close as the last send). gtm@1 stays untouched for campaigns already on it.
+const V2_OFFSETS = [0, 4, 10, 18, 30, 45];
+const V2_FROM_V1 = [1, 2, 3, 4, 5, 10];
+export const GTM_V2: Chain = {
+  steps: V2_FROM_V1.map((from, i) => {
+    const src = GTM_V1.steps.find((x) => x.step === from)!;
+    return { ...src, step: i + 1, offset_days: V2_OFFSETS[i] };
+  }),
 };

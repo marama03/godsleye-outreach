@@ -63,6 +63,7 @@ try {
   check("health ok on an empty store", (await get("/api/health")).ok === true);
   const chains = await get("/api/chains");
   check("built-in gtm@1 chain is available on a fresh clone", chains.some((c) => c.chain_id === "gtm" && c.version === 1 && c.steps === 10), chains);
+  check("gtm@2 is built in: six sends at Day 0, 4, 10, 18, 30, 45", chains.some((c) => c.chain_id === "gtm" && c.version === 2 && c.steps === 6 && c.offsets.join(",") === "0,4,10,18,30,45"), chains);
   check("sheet bridge is not configured", (await get("/api/sheet/status")).configured === false);
   const cr = await post("/api/campaigns", { name: "Local test", icp_sentence: "Founders who still run their own marketing", chain_id: "gtm", chain_version: 1, daily_cap: 10, start_date: utcDay(-5) });
   check("campaign created", cr.status === 201, cr);
