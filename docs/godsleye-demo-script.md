@@ -1,10 +1,10 @@
 # God's L'Eye — six clicks on stage
 
-For Daniel, demo day. Every click you make, the sentence you say while you make it, and what to do
+For you, on demo day. Every click you make, the sentence you say while you make it, and what to do
 if it does not do what it should. Read the fallback line at the bottom once before you start.
 
 **One thing to know before you click.** As of this writing, no click has touched a live sheet yet.
-The sheet loop is built and tested against a simulator, not against your deployed sheet. So the
+The sheet loop is built and tested against a simulator, not against a deployed sheet. So the
 honest position on stage is: the sequence below is the sequence; if a step does not answer, say the
 fallback sentence and keep moving. Do not debug on stage.
 
@@ -20,6 +20,7 @@ variant → mark sent and show the sheet recording it.**
 - Pick your person the night before: someone with an Accepted? = Yes row, research already finished,
   and three variants on the card. Write their name on a sticky note. Do not pick on stage.
 - Have a second row ready, untouched, in case the first one misbehaves.
+- Know your ladder numbers by heart, because you will say them: **4, 10, 18, 30, 45, done.**
 
 ---
 
@@ -54,16 +55,16 @@ depend on the stamp.
 
 ## 3. Press Sync
 
-**Click:** Sync on the Scout page.
+**Click:** Sync on the dashboard.
 
-**Say:** "That press is the agent being woken. It reads the sheet, finds the row I just queued, and
-hands it to research. Everything after this is the machine's work; the sheet is where I can see it
-happened."
+**Say:** "That press wakes the pipeline agent. It reads the sheet, finds
+the row I just queued, and hands it to research. Everything after this is the machine's work; the sheet
+is where I can see it happened."
 
-**What should happen:** the row's Research Status moves `queued` to `dispatched`, then to `ready`,
-and the dossier appears on the row. On a live run this takes the length of a research turn, so in
-the demo the research for this person is already done — the press shows the row landing on the
-dashboard, and the dossier is already there.
+**What should happen:** the row's Research Status moves `queued` to `dispatched`, then to `ready`, and
+the dossier appears on the row. On a live run this takes the length of a research turn, so in the demo
+the research for this person is already done — the press shows the row landing on the dashboard, and
+the dossier is already there.
 
 **If Sync errors or the row does not appear:** say the fallback line (below) and go straight to
 step 4 using the person you prepared in advance.
@@ -75,9 +76,10 @@ step 4 using the person you prepared in advance.
 **Click:** the dossier link on the row (or the card on the dashboard).
 
 **Say:** "This is what research produces before I write a word. Who they are, what the company
-actually does, what they have posted about recently, the one thing worth opening with, and the
-cautions: what not to say to this person. The last section is the one I care about most. It tells
-me what the research could not verify."
+actually does, what they have posted about recently, the one thing worth opening with, the score with
+the evidence under it, and the cautions: what not to say to this person. The last section is the one I
+care about most. It tells me what the research could not verify — and the scoring agent up there reads
+it before it decides whether this person gets my morning."
 
 **Point at:** the hook, then the cautions section. Two seconds each, no scrolling.
 
@@ -113,8 +115,10 @@ makes the whole thing trustworthy."
 Next Due (four days out).
 
 **Say:** "I never touch those four columns. The system wrote them, from one tap, and it wrote them
-into the sheet, not into some database you cannot see. On day four this person comes back to the
-top of my list on their own. On day ten, the last follow-up. Then they are done."
+into the sheet, not into some database you cannot see. On day four this person comes back to the top of
+my list on their own. Day ten, a second nudge. Day eighteen, I ask for a call. Day thirty, I come back
+with something new. Day forty-five, the last touch — and then they are done, six weeks after I first
+said hello, without me holding a single date in my head."
 
 **If the row does not update:** this is the one that matters, so do not paper over it. Say the
 fallback line.
@@ -140,9 +144,16 @@ Then keep going. Do not apologise twice and do not offer to fix it on stage.
 yourself. That is a deliberate limit, not a gap: nothing here can get an account restricted, and
 nothing leaves without you seeing the words first.
 
-**"What does it cost to run?"** One research pass and one writing pass per accepted prospect, and
-nothing per click. The sheet reads and writes are free.
+**"What does it cost to run?"** One research pass, one prioritisation and one writing pass per accepted
+prospect, and nothing per click. The sheet reads and writes are free.
 
 **"Can somebody else use it?"** Yes, and that is the second half of tomorrow: a template sheet they
-copy, a ten minute setup, five questions about their business, and three agents that then know
-what they sell and who they are talking to. The pack is in the room.
+copy, a half-hour setup, five questions about their business, and five agents that then know what
+they sell, who they are talking to, and who hands to whom. One README per agent — they paste it in and
+the agent asks them the questions. And one agent at the front, the Guide, that reads the whole manual
+and walks them through it a step at a time. The pack is in the room.
+
+---
+
+Built by **Daniel Marama**
+[maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)

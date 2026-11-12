@@ -730,7 +730,7 @@ Everything here — the dashboard, the sheet script, this document, the five REA
 - Their own model subscription, or a hosted agent, for the five agents to run on.
 - Somewhere to run the dashboard: it talks to the sheet through its own server, so it is not a page you can drop on free static hosting. A laptop and a tunnel is enough to start.
 
-**Licence:** `[DECIDE: licence — Daniel's call]`.
+**Licence:** `[DECIDE: licence — chosen by whoever publishes this]`.
 
 **One rule worth keeping if you fork it.** The sheet stays the single source of state, and only one writer touches each column. Everything that makes this thing trustworthy — the ladder arithmetic, the repair path, the reason a stuck row stays visibly stuck — comes from that rule, not from the code around it.
 

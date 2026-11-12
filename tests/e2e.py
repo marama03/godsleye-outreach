@@ -3,12 +3,12 @@
 
     # against the live Apps Script deployment
     BRIDGE_URL='https://script.google.com/macros/s/.../exec' BRIDGE_TOKEN='...' \
-        python3 workspace/godseye-e2e.py
+        python3 tests/e2e.py
 
     # against the real Code.gs, run locally in a stubbed Apps Script runtime
-    python3 workspace/godseye-e2e.py --mock
+    python3 tests/e2e.py --mock
 
-Contract under test (workspace/godseye-Code.gs v4, 2026-11-12 — 45-day ladder):
+Contract under test (sheet/Code.gs v4, 2026-11-12 — 45-day ladder):
   to_send -> day4 (+4) -> day10 (+10) -> day18 (+18) -> day30 (+30) -> day45 (+45) -> done,
   every offset counted from `Sent At`, never from the previous step.
   GET  ?token=T[&status=queued]          -> {"rows":[...]}
@@ -38,10 +38,7 @@ import urllib.request
 URL = os.environ.get("BRIDGE_URL", "").rstrip("/")
 TOKEN = os.environ.get("BRIDGE_TOKEN", "")
 _HERE = os.path.dirname(os.path.abspath(__file__))
-SIM = os.path.join(_HERE, "runs", "inbox_0c3edf91affee288d568f208f4d4a363", "test", "apps_script_sim.js")
-if not os.path.exists(SIM):  # the harness moved with the v4 run; keep --mock working either way
-    SIM = os.path.join(_HERE, "runs", "inbox_2bdef9e85832730a8e6099bcebc7d433", "test",
-                       "apps_script_sim.js")
+SIM = os.path.join(_HERE, "apps_script_sim.js")
 fails, total = [], 0
 SIM_PROC = None
 
@@ -134,7 +131,7 @@ def _iso(offset_days=0):
 
 
 def today():
-    return datetime.date.today()
+    return datetime.datetime.now(datetime.timezone.utc).date()  # the script's clock is UTC
 
 
 def plus(n):
