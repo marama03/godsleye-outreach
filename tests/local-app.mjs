@@ -290,6 +290,7 @@ try {
       for (const pth of paths) { const r = await fetch(base + `/api/dossier?path=${encodeURIComponent(pth)}`); if (r.status !== 200 || !/^data\/dossiers\/demo\w+\.md$/.test(pth)) { ok = false; miss.push([pth, r.status]); } }
       check("every dossier_path the demo stores (data/dossiers/<id>.md) opens with 200", ok, { paths, miss });
     }
+    { const cp = await get(`/api/campaigns/${demoId}`); check("campaign page Due today counter matches the Today screen", cp.counters.due_today === wd.cards.length, [cp.counters.due_today, wd.cards.length]); }
     const html = await fetch(base + "/api/dossier?path=demoa1.md", { headers: { accept: "text/html" } });
     const ht = await html.text();
     check("a browser gets a readable page, not a download", html.status === 200 && /text\/html/.test(html.headers.get("content-type")) && /<h1>Dana Whitfield/.test(ht) && /<li>/.test(ht), html.headers.get("content-type"));

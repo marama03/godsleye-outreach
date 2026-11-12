@@ -52,7 +52,8 @@ export function counters(db: Db, c: Campaign, today: string) {
   const invited = rows.filter((r) => r.lead.invited_at || live.some((e) => e.lead_id === r.lead.lead_id && e.kind === "invite_sent")).length;
   const accepted = rows.filter((r) => r.lead.accepted_at || live.some((e) => e.lead_id === r.lead.lead_id && e.kind === "accepted")).length;
   const docs_ready = rows.filter((r) => !!r.lead.dossier_path).length;
-  const due_today = todayQueue(db, c, today).cards.length;
+  const noDossier = new Set(rows.filter((r) => r.state.stage === "accepted" && !r.lead.dossier_path && !r.lead.do_not_contact).map((r) => r.lead.lead_id));
+  const due_today = todayQueue(db, c, today).cards.filter((x) => !noDossier.has(x.lead_id)).length; // same rule as workday(): researching people are not due yet
   return { invited, accepted, docs_ready, due_today };
 }
 
