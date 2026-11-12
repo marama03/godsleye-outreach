@@ -67,7 +67,7 @@ try {
     await sleep(2500);
   }
   const t1 = await txt();
-  check("demo shows waiting-on-you, messages due, 90+ days and invite sections", /They replied, waiting on you/.test(t1) && /Messages due/.test(t1) && /Invites never accepted \(90\+ days\)/.test(t1) && /New people to invite/.test(t1));
+  check("demo shows waiting-on-you, messages due, 90+ days and invite sections", /Replies you logged/.test(t1) && /Messages due/.test(t1) && /Invites never accepted \(90\+ days\)/.test(t1) && /New people to invite/.test(t1));
   await shot("suite-demo.png");
 
   {
@@ -108,12 +108,13 @@ try {
   await view(1280, 900);
 
   await nav("/today");
+  for (let i = 0; i < 24 && !(await ev(`!!document.querySelector('article b')`)); i++) await sleep(250);
   const firstName = await ev(`document.querySelector('article b')?.textContent`);
   check("a Messages due card is shown", !!firstName, firstName);
   check("click Sent on it", await ev(`(()=>{const b=[...document.querySelector('article').querySelectorAll('button')].find(b=>b.textContent.trim()==='Sent');if(!b)return false;b.click();return true})()`));
   check("toast shows with Undo", await waitTxt(/Undo \(/));
   check("click Undo and the card returns", (await click("Undo")) && (await sleep(2600), (await txt()).includes(firstName)));
-  check("I answered clears the waiting reply", (await click("I answered")) && await waitTxt(/Nobody is waiting on an answer/));
+  check("I answered clears the waiting reply", (await click("I answered")) && await waitTxt(/No replies logged yet/));
 
   // every remaining button, on the demo data (each check reloads the screen and reads the counts)
   const cardNames = () => ev(`[...document.querySelectorAll('#sec-due article')].map(a=>a.innerText.slice(0,30))`);
@@ -129,10 +130,13 @@ try {
   check("Skip removes it from today's list", (await dueCount()) === n0 - 1, await dueCount());
   n0 = await dueCount();
   check("Replied (stop sequence) on the first card", await clickIn(`document.querySelector('#sec-due article')`, "Replied"));
+  await sleep(300);
+  check("reply prompt asks what they said", /What did they say\?/.test(await txt()));
+  check("Log reply saves it", await clickIn(`document.querySelector('[role=dialog]')`, "Log reply"));
   await sleep(2600);
   check("Replied removes it from Messages due", (await dueCount()) === n0 - 1);
-  check("Replied puts the person under waiting on you", /They replied, waiting on you\s*1/.test(await txt()));
-  check("Call booked from waiting on you", await click("Call booked") && await waitTxt(/Nobody is waiting on an answer/));
+  check("Replied puts the person under waiting on you", /Replies you logged — waiting on you\s*1/.test(await txt()));
+  check("Call booked from waiting on you", await click("Call booked") && await waitTxt(/No replies logged yet/));
   n0 = await dueCount();
   await sleep(2600);
   check("Not a fit on the first card", await clickIn(`document.querySelector('#sec-due article')`, "Not a fit"));

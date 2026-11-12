@@ -113,7 +113,7 @@ export interface SheetActResult {
 }
 
 export type LedgerEventRow = LedgerEvent & { lead_name: string };
-export type LedgerLeadRow = LeadState & { lead_id: string; name: string; company: string; do_not_contact: boolean };
+export type LedgerLeadRow = LeadState & { lead_id: string; name: string; company: string; title: string; linkedin_url: string; dossier_path: string | null; do_not_contact: boolean };
 
 export interface LedgerResponse {
   events: LedgerEventRow[];

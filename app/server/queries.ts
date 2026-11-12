@@ -232,6 +232,9 @@ export function ledger(db: Db, c: Campaign, today: string, limit: number) {
     lead_id: r.lead.lead_id,
     name: r.lead.name,
     company: r.lead.company,
+    title: r.lead.title,
+    linkedin_url: r.lead.linkedin_url,
+    dossier_path: r.lead.dossier_path,
     do_not_contact: r.lead.do_not_contact,
     ...r.state,
   }));

@@ -156,8 +156,10 @@ try {
     await post("/api/events", { campaign_id: cid, lead_id: "ol0000000005", kind: "withdrawn", idempotency_key: "t-wd-1" });
     w = await wd();
     check("withdrawn invite leaves the 90+ list", !w.stale_invites.some((p) => p.name === "Old Invite"));
-    await post("/api/events", { campaign_id: cid, lead_id: "ev0000000006", kind: "replied", idempotency_key: "t-rep-eve" });
+    await post("/api/events", { campaign_id: cid, lead_id: "ev0000000006", kind: "replied", idempotency_key: "t-rep-eve", note: "  asked for a call\nnext week " });
     await post("/api/events", { campaign_id: cid, lead_id: "fl0000000007", kind: "replied", idempotency_key: "t-rep-flo" });
+    const noteEv = (await get(`/api/ledger?campaign=${cid}&limit=50`)).events.find((e) => e.idempotency_key === "t-rep-eve");
+    check("reply note is stored in the event payload as one clean line", noteEv && noteEv.payload && noteEv.payload.note === "asked for a call next week", noteEv && noteEv.payload);
     w = await wd();
     check("replied leads show as waiting on you", ["Eve", "Flo"].every((n) => w.waiting_on_you.some((r) => r.name === n)), w.waiting_on_you.map((r) => r.name));
     const ans = await post("/api/events", { campaign_id: cid, lead_id: "ev0000000006", kind: "sent", payload: { answered: true }, idempotency_key: "t-ans-eve" });
@@ -311,6 +313,15 @@ try {
   }
 
   const files = ["campaigns.json", "leads.json", "events.json"].every((f) => { try { JSON.parse(readFileSync(join(DATA, f), "utf8")); return true; } catch { return false; } });
+  {
+    const bad = await post("/api/theme", { theme: { primary: "red" } });
+    check("a palette with a non-hex colour is refused", bad.status === 400);
+    const ok = await post("/api/theme", { theme: { primary: "#112233" } });
+    const cfg = await get("/api/config");
+    check("the palette is saved in config and comes back on load", ok.status === 200 && cfg.theme && cfg.theme.primary === "#112233", cfg.theme);
+    await post("/api/theme", { theme: null });
+    check("null resets the palette", (await get("/api/config")).theme === null);
+  }
   check("data files are valid JSON on disk", files);
 } catch (e) {
   check("test run completed without an exception", false, String(e && e.stack || e));

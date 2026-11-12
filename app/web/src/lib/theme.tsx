@@ -1,6 +1,6 @@
 // Brand theme. Every colour in the UI is a CSS variable; this file owns them.
-// Default palette ("Orange meets Navy"). Stored in localStorage only — no data file.
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+// Default palette ("Orange meets Navy"). Saved in data/config.json (follows the person across devices); localStorage is the fallback.
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 export interface Theme {
   primary: string; // buttons, active nav, links
@@ -125,9 +125,30 @@ const C = createContext<Ctx | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(load);
+  const synced = useRef(false); // do not write to the server until it has been asked what it already has
+  // The palette travels with the data (data/config.json). localStorage stays as the fallback and as the first paint.
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/config").then((r) => (r.ok ? r.json() : null)).then((c) => {
+      if (!alive) return;
+      const remote = c?.theme as Partial<Theme> | null | undefined;
+      if (remote && typeof remote === "object") {
+        const out = { ...DEFAULT_THEME };
+        for (const k of Object.keys(DEFAULT_THEME) as (keyof Theme)[]) if (remote[k] && isHex(remote[k]!)) out[k] = normalize(remote[k]!);
+        setThemeState(out);
+      }
+      synced.current = true;
+      if (!remote) setThemeState((t) => ({ ...t })); // nothing saved on the server yet: push what this browser has
+    }).catch(() => { synced.current = true; });
+    return () => { alive = false; };
+  }, []);
   useEffect(() => {
     applyTheme(theme);
     localStorage.setItem(KEY, JSON.stringify(theme));
+    if (synced.current) {
+      const isDef = JSON.stringify(theme) === JSON.stringify(DEFAULT_THEME);
+      fetch("/api/theme", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ theme: isDef ? null : theme }) }).catch(() => undefined);
+    }
   }, [theme]);
   const value = useMemo<Ctx>(
     () => ({

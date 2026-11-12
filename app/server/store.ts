@@ -84,7 +84,7 @@ async function persistTouched(): Promise<void> {
   await fs.rename(tmp, TOUCHED_LOG);
 }
 
-export interface ConfigFile { sheet_url?: string; sheet_title?: string; connected_at?: string; last_synced_at?: string }
+export interface ConfigFile { sheet_url?: string; sheet_title?: string; connected_at?: string; last_synced_at?: string; theme?: Record<string, string> }
 
 /** The connection note an agent (or the owner, from the dashboard) keeps in data/config.json. Never holds a credential. */
 export async function loadConfig(): Promise<ConfigFile> {

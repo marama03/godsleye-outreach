@@ -4,7 +4,7 @@ import { useLive } from "../lib/live";
 import LoadProblem from "../lib/LoadProblem";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { api, fmtWeekdayDate, newIdempotencyKey, type PersonRow, type SheetDueRow, type TodayCard, type WorkdayResponse } from "../lib/api";
+import { api, fmtWeekdayDate, newIdempotencyKey, type LedgerLeadRow, type PersonRow, type SheetDueRow, type TodayCard, type WorkdayResponse } from "../lib/api";
 import { useCampaign } from "../lib/campaign-context";
 import { useToast } from "../lib/toast";
 import { useSide } from "../lib/Shell";
@@ -130,6 +130,25 @@ export default function Workday() {
   }, [data, sheetOn, sync, sheetRows]);
   useEffect(() => () => side.set({ sections: [], meter: null, refresh: null, sync: null }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const [replyFor, setReplyFor] = useState<{ lead_id: string; name: string; step?: number } | null>(null);
+  const [replyNote, setReplyNote] = useState("");
+  const [q, setQ] = useState("");
+  const [people, setPeople] = useState<LedgerLeadRow[] | null>(null);
+  useEffect(() => {
+    if (!active || q.trim().length < 1) { return; }
+    let alive = true;
+    api.ledger(active.id, 1).then((d) => alive && setPeople(d.leads)).catch(() => undefined);
+    return () => { alive = false; };
+  }, [active?.id, q, data]);
+  const askReply = (lead_id: string, name: string, step?: number) => { setReplyNote(""); setReplyFor({ lead_id, name, step }); };
+  async function saveReply() {
+    if (!replyFor) return;
+    const r = replyFor;
+    const note = replyNote.trim();
+    setReplyFor(null); setReplyNote("");
+    await post(r.lead_id, "replied", r.step, undefined, `Reply logged · ${r.name}`, note ? { note } : undefined);
+  }
+
   async function post(lead_id: string, kind: "invite_sent" | "accepted" | "withdrawn" | CardExit, step?: number, body?: string, doneText?: string, payload?: Record<string, unknown>, lock = true) {
     if (!active) return;
     // A second tap right after the first lands on whoever slid up into that spot. Ignore taps for a moment after each action.
@@ -251,6 +270,19 @@ export default function Workday() {
 
   return (
     <div>
+      {replyFor && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center" role="dialog" aria-label="Log a reply">
+          <div className="card w-full max-w-md p-5">
+            <h2 className="font-display text-lg font-extrabold">{replyFor.name} replied</h2>
+            <label className="mt-3 block text-sm font-semibold" htmlFor="reply-note">What did they say? (optional, one line)</label>
+            <input id="reply-note" autoFocus className="input mt-1.5 w-full" value={replyNote} onChange={(e) => setReplyNote(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void saveReply(); }} placeholder="e.g. asked for a call next week" />
+            <div className="mt-4 flex gap-2">
+              <button className="btn-primary" onClick={() => void saveReply()}>Log reply</button>
+              <button className="btn-ghost" onClick={() => setReplyFor(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       <header className="px-5 pb-1 pt-7 lg:px-6">
         <div className="mx-auto max-w-[860px]">
           <h1 className="font-display text-4xl font-black tracking-tight lg:text-5xl">Today</h1>
@@ -269,6 +301,36 @@ export default function Workday() {
               <div className="font-display text-4xl font-black leading-none">{data.researching.length + data.awaiting.length}</div>
               <div className="mt-1 text-sm font-semibold">in the pipeline ({data.awaiting.length} to accept, {data.researching.length} researching)</div>
             </div>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-brand-border bg-brand-card px-3.5 py-3 text-sm">
+            <label className="font-semibold" htmlFor="find-person">Find someone in this campaign</label>
+            <input id="find-person" className="input mt-1.5 w-full !border-2 !border-brand-primary focus:!border-brand-accent focus:!ring-2 focus:!ring-brand-accent/40" placeholder="Search name, company or LinkedIn handle" value={q} onChange={(e) => setQ(e.target.value)} />
+            {q.trim() === "" && <p className="mt-1.5 text-xs text-brand-muted">Search covers this campaign only.</p>}
+            {q.trim() !== "" && (() => {
+              const needle = q.trim().toLowerCase();
+              const hits = (people ?? []).filter((p) => `${p.name} ${p.company} ${p.title} ${p.linkedin_url}`.toLowerCase().includes(needle)).slice(0, 8);
+              if (people === null) return <p className="mt-2 text-brand-muted">Searching...</p>;
+              if (hits.length === 0) return <p className="mt-2 text-brand-muted">No one matching that in this campaign. Search covers this campaign only; switch campaign to search another.</p>;
+              return (
+                <div className="mt-2">
+                  {hits.map((p) => (
+                    <div key={p.lead_id} className="grid grid-cols-1 items-center gap-2 border-t border-brand-border py-2.5 first:border-t-0 sm:grid-cols-[1fr_auto]">
+                      <div>
+                        <b>{p.name}</b> <span className="pill bg-brand-surface text-brand-ink">{String(p.stage).replace("_", " ")}</span>
+                        <span className="block text-sm text-brand-muted">{p.title} at {p.company}{p.days_since_touch != null ? ` · ${p.days_since_touch} days since last touch` : ""}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {p.dossier_path ? <a className="btn-secondary" href={api.dossierUrl(p.dossier_path)} target="_blank" rel="noreferrer">Open dossier</a> : null}
+                        <a className="btn-secondary" href={p.linkedin_url} target="_blank" rel="noreferrer">Open profile</a>
+                        <button className="btn-primary" onClick={() => askReply(p.lead_id, p.name, undefined)}>Replied (stop sequence)</button>
+                        <button className="btn-ghost" onClick={() => post(p.lead_id, "not_a_fit", undefined, undefined, `Marked not a fit · ${p.name}`)}>Not a fit</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="mt-3 rounded-xl border border-brand-border bg-brand-card px-3.5 py-3 text-sm">
@@ -326,8 +388,9 @@ export default function Workday() {
             );
           })()}
 
-          <Section id="waiting" title="They replied, waiting on you" count={data.waiting_on_you.length}>
-            {data.waiting_on_you.length === 0 ? <Empty>Nobody is waiting on an answer.</Empty> : (
+          <Section id="waiting" title="Replies you logged — waiting on you" count={data.waiting_on_you.length}>
+            <p className="mb-2 text-sm text-brand-muted">An agent can't read your LinkedIn inbox. When someone answers, log it here — that's the only way this list fills.</p>
+            {data.waiting_on_you.length === 0 ? <Empty>No replies logged yet — you'll log them as they come in.</Empty> : (
               <div className="card p-4">
                 {data.waiting_on_you.map((wr) => (
                   <div key={wr.lead_id} className={`grid grid-cols-1 items-center gap-2 border-t border-brand-border py-2.5 first:border-t-0 sm:grid-cols-[1fr_auto] ${leaving.has(wr.lead_id) ? "opacity-40" : ""}`}>
@@ -380,7 +443,7 @@ export default function Workday() {
                     <a className="btn-secondary" href={card.linkedin_url} target="_blank" rel="noreferrer">Open profile</a>
                     <button className="btn-secondary" onClick={() => copyBody(card)}>{copied === card.lead_id ? "Copied" : "Copy message"}</button>
                     <button className="btn-primary" onClick={() => post(card.lead_id, "sent", card.step, card.body, `Sent logged · ${card.name}`)}>Sent</button>
-                    <button className="btn-secondary" onClick={() => post(card.lead_id, "replied", card.step, undefined, `Reply logged · ${card.name}`)}>Replied (stop sequence)</button>
+                    <button className="btn-secondary" onClick={() => askReply(card.lead_id, card.name, card.step)}>Replied (stop sequence)</button>
                     <button className="btn-ghost" onClick={() => post(card.lead_id, "skipped", card.step, undefined, `Skipped · ${card.name}`)}>Skip</button>
                     <button className="btn-danger" onClick={() => post(card.lead_id, "not_a_fit", card.step, undefined, `Marked not a fit · ${card.name}`)}>Not a fit</button>
                   </div>

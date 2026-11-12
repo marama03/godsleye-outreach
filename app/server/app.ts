@@ -14,6 +14,7 @@ import {
   saveLeads,
   touchedPaths,
   readDossier,
+  DOSSIER_DIR,
   PROJECT_ROOT,
 } from "./store.js";
 import { sheetConfigured, syncFromSheet, pushLeadToSheet, bridgeToday, bridgeAct } from "./sheet.js";
@@ -220,7 +221,12 @@ export function createApp() {
     const idempotency_key = String(b.idempotency_key ?? "").trim();
     const step = b.step == null ? null : Number(b.step);
     const body_text = b.body_text == null ? null : String(b.body_text);
-    const payload = b.payload && typeof b.payload === "object" ? b.payload : null;
+    let payload = b.payload && typeof b.payload === "object" ? b.payload : null;
+    // The one line the owner types about what they said. Same shape from the button and from an agent: payload.note.
+    const note = typeof b.note === "string" ? b.note : typeof payload?.note === "string" ? payload.note : "";
+    const cleanNote = note.replace(/\s+/g, " ").trim().slice(0, 500);
+    if (kind === "replied" && cleanNote) payload = { ...(payload ?? {}), note: cleanNote };
+    else if (payload && "note" in payload) { const { note: _drop, ...rest } = payload; payload = Object.keys(rest).length ? rest : null; }
 
     if (!idempotency_key) return bad(res, "idempotency_key required");
     if (!EVENT_KINDS.includes(kind)) return bad(res, `kind must be one of ${EVENT_KINDS.join("|")}`);
@@ -273,6 +279,15 @@ export function createApp() {
 
       await saveEvents(db.events);
       if (leadsDirty) await saveLeads(db.leads);
+      if (kind === "replied" && cleanNote && lead.dossier_path) {
+        try {
+          const file = path.join(DOSSIER_DIR, path.basename(lead.dossier_path));
+          const cur = (await readDossier(lead.dossier_path)) ?? "";
+          const stamp = now.slice(0, 10);
+          const block = (/^## What they said/m.test(cur) ? "" : "\n\n## What they said\n") + `\n- ${stamp}: ${cleanNote}\n`;
+          await fs.writeFile(file, cur.replace(/\s+$/, "") + block);
+        } catch { /* the event is saved either way; the dossier note is a convenience */ }
+      }
       if (leadsDirty && (kind === "invite_sent" || kind === "accepted")) void pushLeadToSheet(lead, kind === "accepted" ? { "Research Status": "queued" } : {});
       return { status: 201, body: { duplicate: false, event: evt } };
     });
@@ -364,7 +379,26 @@ export function createApp() {
   // Which sheet is this dashboard paired with? An agent keeps data/config.json; the owner may also paste the link here.
   app.get("/api/config", asyncRoute(async (_req, res) => {
     const c = await loadConfig();
-    res.json({ connected: !!c.sheet_url, sheet_url: c.sheet_url ?? null, sheet_title: c.sheet_title ?? null, connected_at: c.connected_at ?? null, last_synced_at: c.last_synced_at ?? null });
+    res.json({ connected: !!c.sheet_url, sheet_url: c.sheet_url ?? null, sheet_title: c.sheet_title ?? null, connected_at: c.connected_at ?? null, last_synced_at: c.last_synced_at ?? null, theme: c.theme ?? null });
+  }));
+
+  // The brand palette lives in data/config.json so it follows the person across devices. null resets to the default.
+  app.post("/api/theme", asyncRoute(async (req, res) => {
+    const t = req.body?.theme;
+    if (t !== null && (typeof t !== "object" || Array.isArray(t))) return bad(res, "theme must be an object of hex colours, or null to reset");
+    const KEYS = ["primary", "accent", "highlight", "navy", "cream", "neutral", "surface", "card", "ink"];
+    let clean: Record<string, string> | undefined;
+    if (t) {
+      clean = {};
+      for (const k of KEYS) {
+        const v = t[k];
+        if (v === undefined) continue;
+        if (typeof v !== "string" || !/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim())) return bad(res, `${k} must be a hex colour like #ef4124`);
+        clean[k] = v.trim().toLowerCase();
+      }
+    }
+    await withLock(async () => { const c = await loadConfig(); if (clean) c.theme = clean; else delete c.theme; await saveConfig(c); });
+    res.json({ ok: true, theme: clean ?? null });
   }));
 
   app.post("/api/config", asyncRoute(async (req, res) => {
