@@ -4,6 +4,8 @@
 
 You do this once. About ten minutes.
 
+> **Shortcut:** with the dashboard running (step 2), `node tools/phone-setup.mjs` does step 3 for you, checks the address answers, and prints it. Add `--install` to let it install Tailscale. An agent can run it for you.
+
 ## 1. Install Tailscale on both devices
 - Computer: https://tailscale.com/download
 - Phone: "Tailscale" in the App Store or Google Play
