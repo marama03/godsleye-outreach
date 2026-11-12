@@ -323,6 +323,9 @@ export default function Workday() {
                       <div className="flex flex-wrap items-center gap-2">
                         {p.dossier_path ? <a className="btn-secondary" href={api.dossierUrl(p.dossier_path)} target="_blank" rel="noreferrer">Open dossier</a> : null}
                         <a className="btn-secondary" href={p.linkedin_url} target="_blank" rel="noreferrer">Open profile</a>
+                        {data.cards.some((c) => c.lead_id === p.lead_id)
+                          ? <button className="btn-secondary" onClick={() => document.getElementById(`card-${p.lead_id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}>Open today's card</button>
+                          : <span className="text-xs text-brand-muted">not due today</span>}
                         <button className="btn-primary" onClick={() => askReply(p.lead_id, p.name, undefined)}>Replied (stop sequence)</button>
                         <button className="btn-ghost" onClick={() => post(p.lead_id, "not_a_fit", undefined, undefined, `Marked not a fit · ${p.name}`)}>Not a fit</button>
                       </div>
@@ -429,7 +432,7 @@ export default function Workday() {
               </div>
             ) : (
               data.cards.map((card) => (
-                <article key={card.lead_id} className={`card mb-2.5 p-4 transition-opacity ${leaving.has(card.lead_id) ? "opacity-30" : ""}`}>
+                <article key={card.lead_id} id={`card-${card.lead_id}`} className={`card mb-2.5 p-4 transition-opacity ${leaving.has(card.lead_id) ? "opacity-30" : ""}`}>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-extrabold">{card.name}</span>
                     <span className="pill bg-brand-navy text-brand-on-navy">step {card.step} of {card.total_steps}</span>
@@ -478,7 +481,7 @@ export default function Workday() {
           {data.stale_invites.length > 0 && (
             <Section id="stale" title="Invites never accepted (90+ days)" count={data.stale_invites.length}>
               <div className="card p-4">
-                <p className="mb-2 text-sm text-brand-muted">These invites sat unaccepted for 90+ days. These were never accepted after three months. Withdraw them on LinkedIn, then mark each one here so it stops counting as waiting. This dashboard cannot withdraw anything itself.</p>
+                <p className="mb-2 text-sm text-brand-muted">These invites sat unaccepted for 90+ days. Withdraw them on LinkedIn, then mark each one here so it stops counting as waiting. This dashboard cannot withdraw anything itself.</p>
                 <a className="btn-primary mb-2 mr-2 inline-block" href="https://www.linkedin.com/mynetwork/invitation-manager/sent/" target="_blank" rel="noreferrer">Open sent invites on LinkedIn</a>
                 {data.stale_invites.map((p) => personRow(p, (
                   <>

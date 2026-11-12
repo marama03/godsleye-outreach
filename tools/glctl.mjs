@@ -12,6 +12,7 @@
 //   node tools/glctl.mjs sheet:set <google-sheet-url>
 //   node tools/glctl.mjs sheet:status
 //   node tools/glctl.mjs today <campaign-id>
+//   node tools/glctl.mjs replied <campaign-id> <lead-id> [--say "what they said"]
 //
 // Optional: --port 8787 (default), --json (machine-readable output).
 // Exit codes: 0 ok · 1 command failed · 2 bad usage · 3 dashboard not reachable.
@@ -62,6 +63,8 @@ function usage() {
   sheet:set <url>              pair the dashboard with a Google Sheet
   sheet:status                 is a sheet paired
   today <campaign-id>          what is due today
+  replied <campaign-id> <lead-id> [--say "what they said"]
+                               log a reply someone told you about
 
   --port <n>   default 8787     --json   machine-readable`);
   process.exit(2);
@@ -132,6 +135,17 @@ function usage() {
     case "sheet:status": {
       const c = await call("/api/config");
       out(c.connected ? `Paired: ${c.sheet_title ?? c.sheet_url}` : "Not paired yet.", c);
+      break;
+    }
+    case "replied": {
+      const campaign = rest[0]; const lead = rest[1];
+      if (!campaign || !lead) usage();
+      const say = flag("say", "");
+      const r = await call("/api/events", { method: "POST", body: JSON.stringify({
+        campaign_id: campaign, lead_id: lead, kind: "replied",
+        idempotency_key: `replied-${lead}-${Date.now()}`,
+        payload: say ? { note: say } : undefined }) });
+      out(`Logged a reply from ${lead}.${say ? ` They said: ${say}` : ""}`, r);
       break;
     }
     case "today": {

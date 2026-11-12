@@ -140,6 +140,7 @@ async function j<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const e: any = new Error(data?.error ?? `${res.status} ${res.statusText}`);
     e.code = data?.code;
+    e.campaign = data?.campaign;
     throw e;
   }
   return data as T;

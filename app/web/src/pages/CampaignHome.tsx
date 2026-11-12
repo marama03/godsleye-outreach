@@ -57,9 +57,10 @@ function DeleteZone({ id, name, leadCount }: { id: string; name: string; leadCou
   );
 }
 
-function BrokenCampaign({ id, message }: { id: string; message: string }) {
+function BrokenCampaign({ id, message, campaign }: { id: string; message: string; campaign?: { id: string; name: string } | null }) {
   const { campaigns } = useCampaign();
-  const c = campaigns.find((x) => x.id === id);
+  // The error itself names the campaign, so deleting never depends on the cached list being fresh.
+  const c = campaign ?? campaigns.find((x) => x.id === id);
   return (
     <div>
       <div className="card p-6">
@@ -79,12 +80,13 @@ export default function CampaignHome() {
   const [resetting, setResetting] = useState(false);
   const [data, setData] = useState<CampaignResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [errCampaign, setErrCampaign] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     if (!id) return;
     setActiveId(id);
     let alive = true;
-    const load = () => api.campaign(id).then((d) => alive && setData(d)).catch((e) => alive && setErr(e.message));
+    const load = () => api.campaign(id).then((d) => alive && setData(d)).catch((e) => { if (alive) { setErr(e.message); setErrCampaign(e.campaign ?? null); } });
     load();
     const iv = window.setInterval(load, 3000);
     return () => {
@@ -94,7 +96,7 @@ export default function CampaignHome() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (err) return <BrokenCampaign id={id ?? ""} message={err} />;
+  if (err) return <BrokenCampaign id={id ?? ""} message={err} campaign={errCampaign} />;
   if (!data) return <p className="text-brand-muted">Loading…</p>;
   const c = data.campaign;
   const justCreated = sp.get("created") === "1";

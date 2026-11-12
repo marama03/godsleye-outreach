@@ -462,7 +462,7 @@ export function createApp() {
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err?.status ?? 500;
-    res.status(status).json({ error: err?.message ?? "internal error", ...(err?.code === "chain_missing" ? { code: "chain_missing" } : {}) });
+    res.status(status).json({ error: err?.message ?? "internal error", ...(err?.code === "chain_missing" ? { code: "chain_missing", campaign: err.campaign ?? null } : {}) });
   });
 
   return app;

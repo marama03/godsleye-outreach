@@ -85,7 +85,11 @@ elif [ -d "$DIR/app" ]; then
   [ -d "$TMP/data" ] && { rm -rf "$DIR/app/data"; mv "$TMP/data" "$DIR/app/data"; }
   NEWSUM="$(cat "$DIR/app/package.json" "$DIR/app/package-lock.json" 2>/dev/null | cksum)"
   if [ "$OLDSUM" = "$NEWSUM" ] && [ -d "$TMP/node_modules" ]; then mv "$TMP/node_modules" "$DIR/app/node_modules"; fi
-  for f in "$SRC"/*; do [ "$(basename "$f")" = "app" ] || cp -R "$f" "$DIR/"; done
+  # Never overwrite the running script (bash reads it as it goes) or the folder's own README and LICENSE.
+  for f in "$SRC"/*; do
+    case "$(basename "$f")" in app|README.md|LICENSE|setup-dashboard.sh) continue ;; esac
+    cp -R "$f" "$DIR/"
+  done
   rm -rf "$TMP"
   echo "Updated. The previous copy of the app is in $BACKUP if anything looks wrong."
   CHANGED=1
@@ -104,6 +108,11 @@ step "3/4  Installing what the app needs (once; a minute or two)"
 cd "$DIR/app" || exit 4
 if [ ! -d node_modules ] || [ "$CHANGED" -eq 1 ]; then
   npm install --no-audit --no-fund || { echo "Install failed — usually no internet."; exit 5; }
+  if [ "$CHANGED" -eq 1 ]; then
+    # The screen is built output (web/dist). A replaced app has none until it is rebuilt.
+    npm run build >/dev/null 2>&1 || { echo "Could not rebuild the screen. Run: cd \"$DIR/app\" && npm run build"; exit 5; }
+    echo "Screen rebuilt."
+  fi
 else
   echo "Already installed."
 fi
@@ -114,7 +123,7 @@ if [ "$CHANGED" -eq 1 ]; then
 fi
 echo "Dashboard folder: $DIR"
 echo "Data and settings: $DIR/app/data"
-echo "Start it any time with:  cd \"$DIR/app\" && npm run dev"
+echo "Start it any time with:  cd \"$DIR\" && ./start.sh"
 echo "Then open:               http://127.0.0.1:5173"
 
 if [ "$START" -eq 1 ]; then

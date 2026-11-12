@@ -12,14 +12,16 @@ export function chainKey(c: Campaign): string {
 export class ChainMissingError extends Error {
   status = 409;
   code = "chain_missing";
-  constructor(key: string) {
+  campaign?: { id: string; name: string };
+  constructor(key: string, campaign?: { id: string; name: string }) {
     super(`This campaign uses the message chain ${key}, which is not installed in this copy of the dashboard.`);
+    this.campaign = campaign;
   }
 }
 
 export function chainFor(db: Db, c: Campaign): Chain {
   const ch = db.chains[chainKey(c)];
-  if (!ch) throw new ChainMissingError(chainKey(c));
+  if (!ch) throw new ChainMissingError(chainKey(c), { id: c.id, name: c.name });
   return ch;
 }
 
