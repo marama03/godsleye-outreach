@@ -112,7 +112,7 @@ try {
   check("a Messages due card is shown", !!firstName, firstName);
   check("click Sent on it", await ev(`(()=>{const b=[...document.querySelector('article').querySelectorAll('button')].find(b=>b.textContent.trim()==='Sent');if(!b)return false;b.click();return true})()`));
   check("toast shows with Undo", await waitTxt(/Undo \(/));
-  check("click Undo and the card returns", (await click("Undo")) && (await sleep(1500), (await txt()).includes(firstName)));
+  check("click Undo and the card returns", (await click("Undo")) && (await sleep(2600), (await txt()).includes(firstName)));
   check("I answered clears the waiting reply", (await click("I answered")) && await waitTxt(/Nobody is waiting on an answer/));
 
   // every remaining button, on the demo data (each check reloads the screen and reads the counts)
@@ -125,34 +125,36 @@ try {
   check("Copy message on a card", await clickIn(`document.querySelector('#sec-due article')`, "Copy"));
   check("Copy shows Copied feedback", await waitTxt(/Copied/, 3000));
   check("Skip on the first card", await clickIn(`document.querySelector('#sec-due article')`, "Skip"));
-  await sleep(1500);
+  await sleep(2600);
   check("Skip removes it from today's list", (await dueCount()) === n0 - 1, await dueCount());
   n0 = await dueCount();
   check("Replied (stop sequence) on the first card", await clickIn(`document.querySelector('#sec-due article')`, "Replied"));
-  await sleep(1500);
+  await sleep(2600);
   check("Replied removes it from Messages due", (await dueCount()) === n0 - 1);
   check("Replied puts the person under waiting on you", /They replied, waiting on you\s*1/.test(await txt()));
   check("Call booked from waiting on you", await click("Call booked") && await waitTxt(/Nobody is waiting on an answer/));
   n0 = await dueCount();
+  await sleep(2600);
   check("Not a fit on the first card", await clickIn(`document.querySelector('#sec-due article')`, "Not a fit"));
-  await sleep(1500);
+  await sleep(2600);
   check("Not a fit removes it", (await dueCount()) === n0 - 1);
   const accRows = () => ev(`document.querySelectorAll('#sec-accept .grid').length`);
   const acc0 = await accRows();
   check("Accepted on a pending invite", await clickIn(`document.querySelector('#sec-accept')`, "Accepted"));
-  await sleep(1500);
+  await sleep(2600);
   check("Accepted moves it out of Did they accept?", (await accRows()) === acc0 - 1, [acc0, await accRows()]);
   check("Drop on a pending invite", await clickIn(`document.querySelector('#sec-accept')`, "Drop"));
-  await sleep(1500);
+  await sleep(2600);
   check("two invites are listed under 90+ days", /Never accepted \(90\+ days\)\s*2/.test(await txt()));
   check("Drop on one 90+ day invite", await clickIn(`document.querySelector('#sec-stale')`, "Drop"));
-  await sleep(1500);
+  await sleep(2600);
   check("one 90+ day invite is left", /Never accepted \(90\+ days\)\s*1/.test(await txt()));
-  check("Drop all clears the rest", await clickIn(`document.querySelector('#sec-stale')`, "Drop all"));
-  await sleep(2000);
+  await sleep(2600);
+  check("Clear all clears the rest", await clickIn(`document.querySelector('#sec-stale')`, "Clear all"));
+  await sleep(2600);
   check("90+ day section is gone once withdrawn", !(await ev(`!!document.querySelector('#sec-stale')`)));
   check("I invited on LinkedIn on a new prospect", await clickIn(`document.querySelector('#sec-invite')`, "I invited on LinkedIn"));
-  await sleep(1500);
+  await sleep(2600);
   check("invited prospect leaves New people to invite", /Nobody|No new prospects/.test(await ev(`document.querySelector('#sec-invite')?.innerText ?? ''`)));
   for (const r of ["7 days", "14 days", "All", "30 days"]) check(`Scorecard range ${r}`, await click(r) && (await sleep(300), await ev(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===${JSON.stringify(r)})?.getAttribute('aria-pressed')`) === "true"));
   await nav("/ledger");
@@ -170,12 +172,12 @@ try {
   check("Scout page lists people to invite and people waiting", /to invite/.test(await txt()));
   const scoutRows = () => ev(`document.querySelectorAll('main button, article button').length`);
   check("Scout: Invitation sent", await click("Invitation sent"));
-  await sleep(1500);
+  await sleep(2600);
   check("Scout: Invitation sent shows an Undo toast", await waitTxt(/Undo \(/, 3000));
   check("Scout: Undo", await click("Undo"));
-  await sleep(1200);
+  await sleep(2600);
   check("Scout: Mark accepted", await click("Mark accepted"));
-  await sleep(1500);
+  await sleep(2600);
   check("Scout page still renders", /Scout|to invite/.test(await txt()));
 
   await nav("/today");
@@ -227,7 +229,7 @@ try {
   check("click Delete campaign", await click("Delete campaign"));
   check("after deleting, the Welcome screen is back", await waitTxt(/Welcome/, 8000));
   check("deleted campaign is not in the switcher", await ev(`!/Q4 Ops Leaders/.test(document.querySelector('select')?.innerText ?? '')`));
-  check("Create a campaign link works", (await click("Create a campaign")) && (await sleep(1200), /Create campaign/.test(await txt())));
+  check("Create a campaign link works", (await click("Create a campaign")) && (await sleep(2600), /Create campaign/.test(await txt())));
 } catch (e) { fail++; failed.push("exception"); console.log("ERR", String(e.stack || e)); }
 finally { try { ws?.close(); } catch {} chrome.kill(); srv.kill(); try { rmSync(DATA, { recursive: true, force: true }); } catch {} }
 console.log(`\n${fail ? fail + "/" + (pass + fail) + " FAILED: " + failed.join(" | ") : pass + "/" + (pass + fail) + " UI checks passed"}`);

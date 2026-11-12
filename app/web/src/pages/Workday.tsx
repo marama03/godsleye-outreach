@@ -132,7 +132,7 @@ export default function Workday() {
   async function post(lead_id: string, kind: "invite_sent" | "accepted" | "withdrawn" | CardExit, step?: number, body?: string, doneText?: string, payload?: Record<string, unknown>, lock = true) {
     if (!active) return;
     // A second tap right after the first lands on whoever slid up into that spot. Ignore taps for a moment after each action.
-    if (lock) { if (Date.now() < actLock.current) return; actLock.current = Date.now() + 1100; }
+    if (lock) { if (Date.now() < actLock.current) { toast.show({ text: "One at a time. Wait for the card to clear.", ttlMs: 1500 }); return; } actLock.current = Date.now() + 2200; }
     const k = `${lead_id}:${step ?? 0}:${kind}${payload?.booked ? ":booked" : ""}`;
     if (!keys.current.has(k)) keys.current.set(k, newIdempotencyKey());
     try {
@@ -152,7 +152,7 @@ export default function Workday() {
       window.setTimeout(async () => {
         await load();
         setLeaving((s) => { const n = new Set(s); n.delete(lead_id); return n; });
-      }, 320);
+      }, 2000);
     } catch (e: any) {
       toast.show({ text: e.message ?? String(e), ttlMs: 4000 });
     }
@@ -415,7 +415,7 @@ export default function Workday() {
             <Section id="stale" title="Never accepted (90+ days)" count={data.stale_invites.length}>
               <div className="card p-4">
                 <p className="mb-2 text-sm text-brand-muted">These invites were never accepted after 90 days. Drop them so they stop counting as waiting.</p>
-                <button className="btn-secondary mb-2" onClick={async () => { for (const p of data.stale_invites) await post(p.lead_id, "withdrawn", undefined, undefined, `Dropped · ${p.name}`, undefined, false); }}>Drop all {data.stale_invites.length}</button>
+                <button className="btn-secondary mb-2" onClick={async () => { for (const p of data.stale_invites) await post(p.lead_id, "withdrawn", undefined, undefined, `Dropped · ${p.name}`, undefined, false); }}>Clear all {data.stale_invites.length}</button>
                 {data.stale_invites.map((p) => personRow(p, (
                   <>
                     {profile(p)}

@@ -98,7 +98,7 @@ export default function Ledger() {
                     <td className="whitespace-nowrap px-3 py-1.5 text-brand-on-navy/80">{fmtLocal(e.ts_utc)}</td>
                     <td className="whitespace-nowrap px-3 py-1.5 text-brand-navy-muted">{e.ts_utc}</td>
                     <td className="whitespace-nowrap px-3 py-1.5">{e.lead_name}</td>
-                    <td className={`whitespace-nowrap px-3 py-1.5 ${KIND_STYLE[e.kind] ?? ""}`}>{e.kind}</td>
+                    <td className={`whitespace-nowrap px-3 py-1.5 ${KIND_STYLE[e.kind] ?? ""}`}>{e.kind === "withdrawn" ? "dropped" : e.kind}</td>
                     <td className="px-3 py-1.5 text-center">{e.step ?? "—"}</td>
                     <td className="px-3 py-1.5 text-center">{e.variant ?? "—"}</td>
                     <td className="px-3 py-1.5 text-brand-on-navy/80">{shortHash(e.body_hash)}</td>
