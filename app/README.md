@@ -1,15 +1,15 @@
 # God’s L’Eye — GenTeam (Genspark) Edition: dashboard
 
-A standalone demo of a LinkedIn-prospecting tracker. It reads and writes **local JSON files only**.
-No LinkedIn automation, no browser automation, no scheduler, no outbound HTTP, no telemetry,
-no credentials. Sending on LinkedIn stays manual; this app only records it.
+The dashboard for a LinkedIn-prospecting tracker. It reads and writes **local JSON files**, and
+**the app needs no Google credential**. A sheet, if you want one, is kept in step by an agent on the
+same machine. No LinkedIn automation, no browser automation, no scheduler, no telemetry.
+Sending on LinkedIn stays manual; this app only records it.
 
 ```
 package.json
 server/     Express API (port 8787)        app.ts · store.ts · queries.ts · index.ts
 shared/     pure domain code               types · dates (weekend roll) · derive (ONE writer of next_due_date) · chain-gtm
 web/        Vite + React 18 + Tailwind     port 5173, proxies /api -> 8787
-scripts/    seed.ts · verify.ts
 data/       JSON files + dossiers/         created on first run, gitignored
 ```
 
@@ -17,9 +17,7 @@ data/       JSON files + dossiers/         created on first run, gitignored
 
 ```bash
 npm install
-npm run seed -- --campaign=demo   # wipes /data, writes the demo campaign + 12 leads + dossier
 npm run dev                       # server on :8787 + web on :5173 (open http://localhost:5173)
-npm run verify                    # 8 acceptance checks, PASS/FAIL per line, re-seeds afterwards
 npm run build                     # builds web/dist; then `npm start` serves it from the API on :8787
 ```
 
@@ -37,13 +35,14 @@ If port 8787 is taken on your machine: `PORT=8788 npm run dev` — the web proxy
 
 ## Hand-off: set this up for a new user
 
-1. `npm install` then `npm run seed -- --campaign=demo` then `npm run dev`, and open http://localhost:5173.
+1. `npm install` then `npm run dev`, and open http://localhost:5173.
 2. Click **Brand** (top-right) and set your own colours. They are saved in your browser only. Copy-as-JSON lets you move a palette between machines. To change what new users see first, edit `DEFAULT_THEME` in `web/src/lib/theme.tsx`.
-3. Create your campaign on **New campaign**: name, one-line ideal customer, message chain, daily cap.
-4. Connect the Google Sheet (optional, needed for the agent loop): open `sheet/Code.gs` in the sheet's Apps Script, run the setup function, deploy as a web app, then copy `.env.example` to `.env` and fill in `SHEET_BRIDGE_URL` and `SHEET_BRIDGE_TOKEN`. The **Sync sheet** button then appears on the Scout page.
-5. Column contract and agent roles are in `sheet/SCHEMA.md`.
+3. Create your campaign on **New campaign**: name, one-line ideal customer, the built-in `gtm@1` message chain, daily cap.
+4. Leads arrive by being written into `data/leads.json` (facts only, shape below) by an agent on the same machine. The app has no screen for adding a lead by hand.
 
-Without step 4 the app runs entirely on local JSON files.
+The app makes no network calls and needs no account. The optional sheet bridge (`SHEET_BRIDGE_URL` and `SHEET_BRIDGE_TOKEN` in `.env`, backed by `sheet/Code.gs`) is a dormant option: unset, `/api/sheet/status` answers `{"configured":false}` and nothing else changes.
+
+To keep test data out of your real store, set `GODSLEYE_DATA_DIR` to another folder.
 
 ## Branding
 
@@ -77,7 +76,7 @@ is picked automatically by luminance so a pasted palette stays readable.
 | R3 variant by hash | `shared/variant.ts` → `parseInt(lead_id[0],16) % 2 === 0 ? "A" : "B"`. |
 | R4 weekend roll | `shared/dates.ts` → `rollWeekend`. Single helper. |
 | R5 every card has an exit | `web/src/pages/Today.tsx` — four buttons, always. Skip is an event, not a filter. |
-| R6 nothing derived is stored | `server/queries.ts` recomputes stage/step/due/counters per request; `verify` greps the JSON for derived keys. |
+| R6 nothing derived is stored | `server/queries.ts` recomputes stage/step/due/counters per request; `tests/local-app.mjs` exercises it end to end. |
 | R7 do-not-contact hard stop | `server/queries.ts` → `todayQueue` filters it first; `deriveLeadState.eligible` is false. |
 | R8 daily cap | `todayQueue` slices to `daily_cap`, oldest `days_since_touch` first; overflow reports the next weekday. |
 | R9 reply stops the sequence | `eligible=false` once a live `replied` exists; lead moves to the "Waiting on you" strip. |
@@ -88,8 +87,8 @@ through one mutex and written temp-file-then-rename.
 
 ## Demo run of show (about four minutes)
 
-0. Night before: `npm run seed -- --campaign=demo`, swap `data/dossiers/<id>.md` for a real dossier
-   if you want, edit copy in `shared/chain-gtm.ts` as `gtm@2` if you change it, `npm run verify`.
+0. Night before: write a few leads into `data/leads.json`, put dossiers in `data/dossiers/<id>.md` if you
+   want, and run `node tests/local-app.mjs` from the repo root. Change copy in `shared/chain-gtm.ts` only as `gtm@2`.
 1. **New campaign** → Create. One row, one id on screen.
 2. **Scout** → Invitation sent ×2. Watch the undo toast; the row greys.
 3. The accepted lead (Priya Raman) — dossier ready, card in Today. Open dossier.
@@ -103,4 +102,4 @@ through one mutex and written temp-file-then-rename.
 - `chains.json` — `{ "gtm@1": { steps: [{ step, offset_days, angle, template, variant_a, variant_b }] } }`
 - `leads.json` — facts only (`invited_at`, `accepted_at`, `withdrawn_at`, `do_not_contact`, `dossier_path`, `reply_status`)
 - `events.json` — `{ event_id, ts_utc, campaign_id, lead_id, kind, step, variant, body_hash, idempotency_key, corrects_event_id, payload }`
-- `touched-paths.json` — every path the app has written, for verify check 8
+- `touched-paths.json` — every path the app has written

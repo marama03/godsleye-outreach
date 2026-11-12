@@ -54,7 +54,7 @@ Each one is a decision, not a gap. `docs/godsleye-start-here.md`, section 4, say
 - `docs/` — the manual, the demo script, the operator checklist, the five agent READMEs.
 - `sheet/` — the Apps Script that backs the sheet. It owns state and dates. No agent writes state.
 - `app/` — the dashboard: Today, the row cards, the send and undo path.
-- `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). Neither touches a real sheet.
+- `tests/` holds the sheet-script checks. `node tests/apps_script_sim.js` runs 119 checks against `sheet/Code.gs` inside a stubbed Apps Script runtime; `python3 tests/e2e.py` runs 117 end-to-end checks (needs node). `node tests/local-app.mjs` runs 20 checks on the dashboard's local store (needs `npm install` in `app/`): sent, skip, undo, double-click and restart, with no sheet or token. Neither touches a real sheet.
 - The pack's `godsleye-Code.gs` is `sheet/Code.gs` here.
 
 ## Status

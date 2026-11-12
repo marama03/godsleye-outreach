@@ -4,10 +4,11 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Campaign, ChainsFile, Lead, LedgerEvent } from "../shared/types.js";
+import { GTM_V1 } from "../shared/chain-gtm.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const PROJECT_ROOT = path.resolve(__dirname, "..");
-export const DATA_DIR = path.join(PROJECT_ROOT, "data");
+export const DATA_DIR = process.env.GODSLEYE_DATA_DIR ? path.resolve(process.env.GODSLEYE_DATA_DIR) : path.join(PROJECT_ROOT, "data");
 export const DOSSIER_DIR = path.join(DATA_DIR, "dossiers");
 export const TOUCHED_LOG = path.join(DATA_DIR, "touched-paths.json");
 
@@ -82,7 +83,8 @@ export async function loadDb(): Promise<Db> {
     readJson<Lead[]>(FILES.leads, []),
     readJson<LedgerEvent[]>(FILES.events, []),
   ]);
-  return { campaigns, chains, leads, events };
+  // A fresh clone has no chains.json; the built-in chain is always available (a stored one wins).
+  return { campaigns, chains: { "gtm@1": GTM_V1, ...chains }, leads, events };
 }
 
 export async function saveCampaigns(rows: Campaign[]): Promise<void> {
