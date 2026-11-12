@@ -44,11 +44,11 @@ Everything the system needs is reachable from here. Nothing else in the pack is 
 - **Nothing to install.** There is no script, no deployment and no token anywhere in this setup. An
   agent you own writes the sheet through its own Google connection. Section 6.
 - **The five READMEs.** One per agent, each self-contained:
-  `agent-briefs/linkedin-prospect-scout-FINAL.md`,
-  `agent-briefs/linkedin-outreach-tracker-FINAL.md`,
-  `agent-briefs/linkedin-intel-researcher-FINAL.md`,
-  `agent-briefs/linkedin-strategy-prioritizer-FINAL.md`,
-  `agent-briefs/linkedin-outreach-copywriter-FINAL.md`.
+  `agent-briefs/linkedin-prospect-scout.md`,
+  `agent-briefs/linkedin-outreach-tracker.md`,
+  `agent-briefs/linkedin-intel-researcher.md`,
+  `agent-briefs/linkedin-strategy-prioritizer.md`,
+  `agent-briefs/linkedin-outreach-copywriter.md`.
 - **The repository.** https://github.com/marama03/godsleye-outreach — optional, for changing the code. Nothing in the setup needs it.
   Section 20.
 - **This document.** The manual, and the Scout's own instructions for the setup. It is the one file
@@ -188,7 +188,7 @@ exist yet — and its README says what to do about it.
 who they target and refuse, how many is a run — then the closing question every README carries: *"Is
 there anything you want me to know about your business, voice or offer before we start?"* Save the
 answers in your own notes, and read `Inputs/brand.md` first if it exists. Then take your own README —
-`agent-briefs/linkedin-prospect-scout-FINAL.md` — as the file you follow for the finding job from now
+`agent-briefs/linkedin-prospect-scout.md` — as the file you follow for the finding job from now
 on. Finally tell them the setup is done, and give them the first command, spelled out:
 `Find 12 <your target> in <your place> for the campaign <name>.` Tell them that from here the daily
 routine is section 10 and the first run is section 9.
@@ -872,15 +872,15 @@ Everything here — the dashboard, this document, the five READMEs, and the opti
 
 | File | What it is |
 |---|---|
-| `godsleye-start-here-FINAL.md` | This document. Read once |
-| `agent-briefs/linkedin-prospect-scout-FINAL.md` | LinkedIn Prospect Scout's README |
-| `agent-briefs/linkedin-outreach-tracker-FINAL.md` | LinkedIn Outreach Tracker's README |
-| `agent-briefs/linkedin-intel-researcher-FINAL.md` | LinkedIn Intel Researcher's README |
-| `agent-briefs/linkedin-strategy-prioritizer-FINAL.md` | LinkedIn Strategy Prioritizer's README |
-| `agent-briefs/linkedin-outreach-copywriter-FINAL.md` | LinkedIn Outreach Copywriter's README |
-| `godsleye-operator-flow-FINAL.md` | The same setup as a checklist, for the second time through |
-| `godsleye-demo-script-FINAL.md` | The six clicks, for showing this to someone |
-| `godsleye-Code-FINAL.gs` | The optional sheet script — the path this design replaced. Not needed for the setup |
+| `godsleye-start-here.md` | This document. Read once |
+| `agent-briefs/linkedin-prospect-scout.md` | LinkedIn Prospect Scout's README |
+| `agent-briefs/linkedin-outreach-tracker.md` | LinkedIn Outreach Tracker's README |
+| `agent-briefs/linkedin-intel-researcher.md` | LinkedIn Intel Researcher's README |
+| `agent-briefs/linkedin-strategy-prioritizer.md` | LinkedIn Strategy Prioritizer's README |
+| `agent-briefs/linkedin-outreach-copywriter.md` | LinkedIn Outreach Copywriter's README |
+| `godsleye-operator-flow.md` | The same setup as a checklist, for the second time through |
+| `godsleye-demo-script.md` | The six clicks, for showing this to someone |
+| `sheet/Code.gs` | The optional sheet script — the path this design replaced. Not needed for the setup |
 | Template sheet, preview only | The shape, with the header row and the `Events` tab. Not copied. Link in section 2 |
 
 Each README is self-contained: an agent gets one file and needs nothing else from this pack. They are
@@ -888,10 +888,7 @@ written in the same order every time — who you are, what your name must be, th
 what you write, what you must ask, your first run, and how to fail — so that you can find the same
 thing in the same place in all five.
 
-Every file here ends in `-FINAL`, and that is the whole naming rule: the file without it is an older
-draft, and the ones with it are the ones going out. If a name in this table does not match what you
-have, the `-FINAL` file is the current one. The sheet script is still one file, and its contents did
-not change when the pack was named; it is simply no longer part of the setup.
+The agent READMEs are in `docs/agent-briefs/`, named after each agent. The optional sheet script is `sheet/Code.gs` and is no longer part of the setup.
 
 ---
 
