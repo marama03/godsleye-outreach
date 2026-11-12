@@ -17,9 +17,10 @@ import {
   PROJECT_ROOT,
 } from "./store.js";
 import { sheetConfigured, syncFromSheet, pushLeadToSheet, bridgeToday, bridgeAct } from "./sheet.js";
-import { counters, todayQueue, scoutRows, ledger, chainKey, workday } from "./queries.js";
+import { counters, todayQueue, scoutRows, ledger, chainKey, chainFor, workday } from "./queries.js";
 import { registerLive } from "./live.js";
 import { seedDemo } from "./demo.js";
+import { refuseReason, undoRefusal } from "./rules.js";
 import { todayYmd } from "../shared/dates.js";
 import { campaignIdFor, newEventId, sha256Hex, variantFor } from "../shared/hash.js";
 import { EVENT_KINDS, type Campaign, type EventKind, type LedgerEvent } from "../shared/types.js";
@@ -198,6 +199,9 @@ export function createApp() {
       const lead = db.leads.find((l) => l.lead_id === lead_id && l.campaign_id === campaign_id);
       if (!lead) return { status: 404, body: { error: "lead not found in campaign" } };
 
+      const refusal = refuseReason(lead, chainFor(db, c), db.events.filter((e) => e.lead_id === lead_id), kind, step, payload);
+      if (refusal) return { status: 400, body: { error: refusal } };
+
       const now = new Date().toISOString();
       const evt: LedgerEvent = {
         event_id: newEventId(),
@@ -245,6 +249,8 @@ export function createApp() {
       const key = `idk_undo_${target}`;
       const dup = db.events.find((e) => e.idempotency_key === key);
       if (dup) return { status: 200, body: { duplicate: true, existing_event_id: dup.event_id } };
+      const undoBlock = undoRefusal(orig, db.events.filter((e) => e.lead_id === orig.lead_id));
+      if (undoBlock) return { status: 400, body: { error: undoBlock } };
       const now = new Date().toISOString();
       const evt: LedgerEvent = {
         event_id: newEventId(),
@@ -380,7 +386,7 @@ export function createApp() {
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err?.status ?? 500;
-    res.status(status).json({ error: err?.message ?? "internal error" });
+    res.status(status).json({ error: err?.message ?? "internal error", ...(err?.code === "chain_missing" ? { code: "chain_missing" } : {}) });
   });
 
   return app;

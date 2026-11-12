@@ -20,6 +20,7 @@ const PORT = await freePort(), CP = await freePort();
 const BASE = `http://127.0.0.1:${PORT}`;
 const DATA = mkdtempSync(join(tmpdir(), "godsleye-ui-"));
 const SHOTS = process.env.SHOTS_DIR || null;
+if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const srv = spawn(process.execPath, [join(APP, "node_modules", "tsx", "dist", "cli.mjs"), "server/index.ts"], { cwd: APP, env: { ...process.env, PORT: String(PORT), GODSLEYE_DATA_DIR: DATA }, stdio: "ignore" });
 for (let i = 0; i < 60; i++) { try { if ((await fetch(BASE + "/api/health")).ok) break; } catch {} await sleep(300); }
@@ -34,7 +35,17 @@ try {
   const send = (method, params = {}) => new Promise((res) => { const i = ++id; pend.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
   const ev = async (e) => { const r = await send("Runtime.evaluate", { expression: e, returnByValue: true, awaitPromise: true }); if (r.result?.exceptionDetails) throw new Error(JSON.stringify(r.result.exceptionDetails.exception?.description ?? r.result.exceptionDetails)); return r.result?.result?.value; };
   const view = (w, h, mobile) => send("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: 1, mobile: !!mobile });
-  const nav = async (p) => { await send("Page.navigate", { url: BASE + p }); await sleep(2200); };
+  const nav = async (p) => {
+    await send("Page.navigate", { url: BASE + p });
+    await sleep(800);
+    // wait until the screen has finished loading (no "Loading…" and some content), up to 12 s
+    for (let i = 0; i < 48; i++) {
+      const ok = await ev(`document.readyState === "complete" && !/Loading…/.test(document.body.innerText) && document.body.innerText.length > 80`).catch(() => false);
+      if (ok) break;
+      await sleep(250);
+    }
+    await sleep(700);
+  };
   const txt = () => ev("document.body.innerText");
   const waitTxt = async (re, ms = 6000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (re.test(await txt())) return true; await sleep(250); } return false; };
   const click = (text, scope = "document") => ev(`(()=>{const b=[...${scope}.querySelectorAll('button,a')].find(b=>b.textContent.trim().includes(${JSON.stringify(text)}));if(!b)return false;b.click();return true;})()`);
@@ -46,7 +57,7 @@ try {
 
   check("empty install shows Welcome with Create and Load the demo", /Welcome/.test(await txt()) && /Load the demo/.test(await txt()) && /Create a campaign/.test(await txt()));
   check("click Load the demo", await click("Load the demo"));
-  check("demo campaign appears on Today", await waitTxt(/Q4 Service Owners \(demo\)/) && await waitTxt(/Scorecard/));
+  check("demo campaign appears on Today", await waitTxt(/Q4 Ops Leaders \(demo\)/) && await waitTxt(/Scorecard/));
   {
     const camp = (await (await fetch(BASE + "/api/campaigns")).json())[0];
     const { readFileSync } = await import("node:fs");
@@ -179,18 +190,37 @@ try {
   check("Ledger: Lead state tab", await click("Lead state") && /waiting_on_me/.test(await txt()));
   check("Ledger: back to taps tab", await click("What your taps") && /idempotency_key/.test(await txt()));
 
+  // a campaign whose message chain is not installed must degrade, not break
+  {
+    const { readFileSync } = await import("node:fs");
+    const made = await (await fetch(BASE + "/api/campaigns", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "Broken chain", icp_sentence: "x", chain_id: "gtm", chain_version: 1, daily_cap: 5, start_date: "2026-11-01" }) })).json();
+    const camps = JSON.parse(readFileSync(join(DATA, "campaigns.json"), "utf8"));
+    camps.find((c) => c.id === made.campaign.id).chain_id = "nochain";
+    writeFileSync(join(DATA, "campaigns.json"), JSON.stringify(camps));
+    await sleep(2500);
+    await nav(`/campaigns/${made.campaign.id}`);
+    check("a campaign with a missing chain explains itself instead of failing", await waitTxt(/not installed in this copy/, 8000), (await txt()).slice(0, 300));
+    check("and still offers delete", /Delete this campaign/.test(await txt()));
+    await nav("/today");
+    check("Today for it shows the explanation, not an endless Loading", await waitTxt(/cannot be shown/, 8000));
+    await nav(`/campaigns/${made.campaign.id}`);
+    await waitTxt(/Delete this campaign/, 8000);
+    await setVal("#del-confirm", "Broken chain");
+    check("delete the broken campaign", await click("Delete campaign"));
+    check("back on a working campaign after deleting it", await waitTxt(/Scorecard/, 10000));
+  }
+
   await nav("/today");
   check("Manage campaign link is in the sidebar", await click("Manage campaign"));
-  await sleep(1500);
-  check("campaign page shows the delete control", /Delete this campaign/.test(await txt()));
+  check("campaign page shows the delete control", await waitTxt(/Delete this campaign/, 10000), (await txt()).slice(0, 300));
   check("Delete button is disabled until the name is typed", await delDisabled());
   await setVal("#del-confirm", "wrong");
   check("still disabled with a wrong name", await delDisabled());
-  await setVal("#del-confirm", "Q4 Service Owners (demo)");
+  await setVal("#del-confirm", "Q4 Ops Leaders (demo)");
   check("enabled with the exact name", !(await delDisabled()));
   check("click Delete campaign", await click("Delete campaign"));
   check("after deleting, the Welcome screen is back", await waitTxt(/Welcome/, 8000));
-  check("deleted campaign is not in the switcher", await ev(`!/Q4 Service Owners/.test(document.querySelector('select')?.innerText ?? '')`));
+  check("deleted campaign is not in the switcher", await ev(`!/Q4 Ops Leaders/.test(document.querySelector('select')?.innerText ?? '')`));
   check("Create a campaign link works", (await click("Create a campaign")) && (await sleep(1200), /Create campaign/.test(await txt())));
 } catch (e) { fail++; failed.push("exception"); console.log("ERR", String(e.stack || e)); }
 finally { try { ws?.close(); } catch {} chrome.kill(); srv.kill(); try { rmSync(DATA, { recursive: true, force: true }); } catch {} }

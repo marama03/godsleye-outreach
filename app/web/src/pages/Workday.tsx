@@ -1,6 +1,7 @@
 // The one-screen Today, laid out like God's L'Eye: big title, two stat tiles, a live sync line,
 // then folding sections. Sending on LinkedIn stays manual; every button here only records it.
 import { useLive } from "../lib/live";
+import LoadProblem from "../lib/LoadProblem";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { api, fmtWeekdayDate, newIdempotencyKey, type PersonRow, type SheetDueRow, type TodayCard, type WorkdayResponse } from "../lib/api";
@@ -37,6 +38,7 @@ export default function Workday() {
   const toast = useToast();
   const side = useSide();
   const [data, setData] = useState<WorkdayResponse | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const [leaving, setLeaving] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState<string | null>(null);
   const [sheetOn, setSheetOn] = useState(false);
@@ -65,7 +67,13 @@ export default function Workday() {
     if (!active) return;
     // ?date=YYYY-MM-DD previews another day (demo use); omitted = today
     const d = new URLSearchParams(window.location.search).get("date") ?? undefined;
-    setData(await api.workday(active.id, d));
+    try {
+      setData(await api.workday(active.id, d));
+      setLoadErr(null);
+    } catch (e: any) {
+      setData(null);
+      setLoadErr(e?.message ?? String(e));
+    }
   }, [active]);
 
   useEffect(() => {
@@ -222,6 +230,7 @@ export default function Workday() {
       </div>
     </div>
   );
+  if (loadErr) return <LoadProblem message={loadErr} />;
   if (!data) return <div className="px-6 py-10 text-brand-muted">Loading…</div>;
 
   const dueNow = sheetOn ? sheetRows?.length ?? 0 : data.cards.length;

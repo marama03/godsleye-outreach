@@ -6,7 +6,7 @@ import { DOSSIER_DIR, loadDb, saveCampaigns, saveEvents, saveLeads } from "./sto
 import { campaignIdFor, newEventId, sha256Hex, variantFor } from "../shared/hash.js";
 import type { Campaign, Lead, LedgerEvent } from "../shared/types.js";
 
-export const DEMO_NAME = "Q4 Service Owners (demo)";
+export const DEMO_NAME = "Q4 Ops Leaders (demo)";
 
 export async function seedDemo(): Promise<{ created: boolean; campaign_id: string }> {
   const db = await loadDb();

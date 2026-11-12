@@ -1,4 +1,5 @@
 import { useLive } from "../lib/live";
+import LoadProblem from "../lib/LoadProblem";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, newIdempotencyKey, type ScoutRow } from "../lib/api";
@@ -14,13 +15,19 @@ export default function Scout() {
   // one idempotency key per (lead, action) intent — a double-tap reuses it, so it writes one row
   const [sheetOn, setSheetOn] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const keys = useRef(new Map<string, string>());
 
   const load = async () => {
     if (!active) return;
-    const d = await api.scout(active.id);
-    setRows(d.rows);
-    setIcp(d.icp_sentence);
+    try {
+      const d = await api.scout(active.id);
+      setRows(d.rows);
+      setIcp(d.icp_sentence);
+      setLoadErr(null);
+    } catch (e: any) {
+      setLoadErr(e?.message ?? String(e));
+    }
   };
 
   useEffect(() => {
@@ -71,6 +78,7 @@ export default function Scout() {
   }
 
   if (!active) return <p className="text-brand-muted">No campaign yet. <Link className="underline" to="/campaigns/new">Create one.</Link></p>;
+  if (loadErr) return <LoadProblem message={loadErr} />;
 
   const uninvited = rows.filter((r) => !r.invited);
   const invited = rows.filter((r) => r.invited);

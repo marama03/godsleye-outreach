@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import LoadProblem from "../lib/LoadProblem";
 import { Link } from "react-router-dom";
 import { api, fmtLocal, shortHash, type LedgerResponse } from "../lib/api";
 import { useCampaign } from "../lib/campaign-context";
@@ -23,12 +24,20 @@ export default function Ledger() {
   const [tab, setTab] = useState<"taps" | "state">("taps");
   const seen = useRef<Set<string>>(new Set());
   const [fresh, setFresh] = useState<Set<string>>(new Set());
+  const [loadErr, setLoadErr] = useState<string | null>(null);
 
   useEffect(() => {
     if (!active) return;
     let alive = true;
     const load = async () => {
-      const d = await api.ledger(active.id, 50);
+      let d;
+      try {
+        d = await api.ledger(active.id, 50);
+        setLoadErr(null);
+      } catch (e: any) {
+        if (alive) setLoadErr(e?.message ?? String(e));
+        return;
+      }
       if (!alive) return;
       const newIds = d.events.map((e) => e.event_id).filter((id) => !seen.current.has(id));
       const first = seen.current.size === 0;
@@ -45,6 +54,7 @@ export default function Ledger() {
   }, [active?.id]);
 
   if (!active) return <p className="text-brand-muted">No campaign yet. <Link className="underline" to="/campaigns/new">Create one.</Link></p>;
+  if (loadErr) return <LoadProblem message={loadErr} />;
   if (!data) return <p className="text-brand-muted">Loading…</p>;
 
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

@@ -137,7 +137,11 @@ async function j<T>(res: Response): Promise<T> {
   } catch {
     /* noop */
   }
-  if (!res.ok) throw new Error(data?.error ?? `${res.status} ${res.statusText}`);
+  if (!res.ok) {
+    const e: any = new Error(data?.error ?? `${res.status} ${res.statusText}`);
+    e.code = data?.code;
+    throw e;
+  }
   return data as T;
 }
 

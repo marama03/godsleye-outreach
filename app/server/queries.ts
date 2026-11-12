@@ -8,9 +8,18 @@ export function chainKey(c: Campaign): string {
   return `${c.chain_id}@${c.chain_version}`;
 }
 
+/** A campaign whose message chain is not installed in this copy. Answered as 409, and the screens say so instead of failing. */
+export class ChainMissingError extends Error {
+  status = 409;
+  code = "chain_missing";
+  constructor(key: string) {
+    super(`This campaign uses the message chain ${key}, which is not installed in this copy of the dashboard.`);
+  }
+}
+
 export function chainFor(db: Db, c: Campaign): Chain {
   const ch = db.chains[chainKey(c)];
-  if (!ch) throw new Error(`chain ${chainKey(c)} not found`);
+  if (!ch) throw new ChainMissingError(chainKey(c));
   return ch;
 }
 

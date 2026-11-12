@@ -13,14 +13,56 @@ function Counter({ label, value, to }: { label: string; value: number; to?: stri
   return to ? <Link to={to} className="block hover:opacity-90">{inner}</Link> : inner;
 }
 
-export default function CampaignHome() {
-  const { id } = useParams();
-  const [sp] = useSearchParams();
-  const { setActiveId, refresh } = useCampaign();
+function DeleteZone({ id, name, leadCount }: { id: string; name: string; leadCount: number | null }) {
+  const { refresh } = useCampaign();
   const nav = useNavigate();
   const [confirmText, setConfirmText] = useState("");
   const [delErr, setDelErr] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  return (
+    <section className="card mt-10 border-brand-danger p-5" aria-label="Delete campaign">
+      <h2 className="text-lg font-bold">Delete this campaign</h2>
+      <p className="mt-1 text-sm text-brand-muted">
+        Removes <b>{name}</b> with {leadCount === null ? "all its leads" : `its ${leadCount} leads`} and all their history. Other campaigns are not touched. A copy is kept in <code className="font-mono">data/deleted/</code> so it can be restored by hand.
+      </p>
+      <form
+        className="mt-3 flex flex-wrap items-center gap-2"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setDeleting(true); setDelErr(null);
+          try { await api.deleteCampaign(id, confirmText); await refresh(); nav("/today"); }
+          catch (err: any) { setDelErr(err.message ?? String(err)); }
+          finally { setDeleting(false); }
+        }}
+      >
+        <label className="sr-only" htmlFor="del-confirm">Type the campaign name to confirm</label>
+        <input id="del-confirm" className="input min-w-0 flex-1" placeholder={`Type “${name}” to confirm`} value={confirmText} onChange={(e) => setConfirmText(e.target.value)} autoComplete="off" />
+        <button className="btn-danger" disabled={deleting || confirmText.trim() !== name}>{deleting ? "Deleting…" : "Delete campaign"}</button>
+      </form>
+      {delErr && <p className="mt-2 text-sm text-brand-danger">{delErr}</p>}
+    </section>
+  );
+}
+
+function BrokenCampaign({ id, message }: { id: string; message: string }) {
+  const { campaigns } = useCampaign();
+  const c = campaigns.find((x) => x.id === id);
+  return (
+    <div>
+      <div className="card p-6">
+        <h1 className="text-2xl font-bold tracking-tight">{c?.name ?? id}</h1>
+        <p className="mt-2 text-brand-danger">{message}</p>
+        <p className="mt-2 text-sm text-brand-muted">Nothing was changed. The other campaigns still work.</p>
+      </div>
+      {c && <DeleteZone id={c.id} name={c.name} leadCount={null} />}
+    </div>
+  );
+}
+
+export default function CampaignHome() {
+  const { id } = useParams();
+  const [sp] = useSearchParams();
+  const { setActiveId } = useCampaign();
   const [data, setData] = useState<CampaignResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -38,7 +80,7 @@ export default function CampaignHome() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (err) return <p className="text-brand-danger">{err}</p>;
+  if (err) return <BrokenCampaign id={id ?? ""} message={err} />;
   if (!data) return <p className="text-brand-muted">Loading…</p>;
   const c = data.campaign;
   const justCreated = sp.get("created") === "1";
@@ -86,27 +128,7 @@ export default function CampaignHome() {
       </div>
       <p className="mt-4 text-xs text-brand-muted">All four counters are computed from the event ledger on every load. None of them is stored.</p>
 
-      <section className="card mt-10 border-brand-danger p-5" aria-label="Delete campaign">
-        <h2 className="text-lg font-bold">Delete this campaign</h2>
-        <p className="mt-1 text-sm text-brand-muted">
-          Removes <b>{c.name}</b> with its {data.counters.invited} leads and all their history. Other campaigns are not touched. A copy is kept in <code className="font-mono">data/deleted/</code> so it can be restored by hand.
-        </p>
-        <form
-          className="mt-3 flex flex-wrap items-center gap-2"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setDeleting(true); setDelErr(null);
-            try { await api.deleteCampaign(c.id, confirmText); await refresh(); nav("/today"); }
-            catch (err: any) { setDelErr(err.message ?? String(err)); }
-            finally { setDeleting(false); }
-          }}
-        >
-          <label className="sr-only" htmlFor="del-confirm">Type the campaign name to confirm</label>
-          <input id="del-confirm" className="input min-w-0 flex-1" placeholder={`Type “${c.name}” to confirm`} value={confirmText} onChange={(e) => setConfirmText(e.target.value)} autoComplete="off" />
-          <button className="btn-danger" disabled={deleting || confirmText.trim() !== c.name}>{deleting ? "Deleting…" : "Delete campaign"}</button>
-        </form>
-        {delErr && <p className="mt-2 text-sm text-brand-danger">{delErr}</p>}
-      </section>
+      <DeleteZone id={c.id} name={c.name} leadCount={data.counters.invited} />
     </div>
   );
 }

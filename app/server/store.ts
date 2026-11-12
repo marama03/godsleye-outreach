@@ -49,14 +49,22 @@ async function ensureDirs(): Promise<void> {
   recordTouch(DOSSIER_DIR);
 }
 
+// A missing file means "empty". Anything else (a file mid-rename on Windows, or half-written by another program)
+// is retried, and if it never clears it is an error: never mistaken for an empty store, because the next write would erase real data.
 async function readJson<T>(file: string, fallback: T): Promise<T> {
-  try {
-    const raw = await fs.readFile(file, "utf8");
-    return JSON.parse(raw) as T;
-  } catch (err: any) {
-    if (err?.code === "ENOENT") return fallback;
-    throw err;
+  let last: any;
+  for (let attempt = 0; attempt < 12; attempt++) {
+    try {
+      const raw = await fs.readFile(file, "utf8");
+      return JSON.parse(raw) as T;
+    } catch (err: any) {
+      // rename-over-existing can look like "missing" for a moment on Windows; only believe it if it stays missing
+      if (err?.code === "ENOENT" && attempt >= 3) return fallback;
+      last = err;
+      await new Promise((r) => setTimeout(r, 40 + attempt * 30));
+    }
   }
+  throw last;
 }
 
 export async function atomicWrite(file: string, data: unknown): Promise<void> {

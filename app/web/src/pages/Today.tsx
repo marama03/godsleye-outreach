@@ -1,4 +1,5 @@
 import { useLive } from "../lib/live";
+import LoadProblem from "../lib/LoadProblem";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, fmtWeekdayDate, newIdempotencyKey, type TodayCard, type TodayResponse } from "../lib/api";
@@ -13,12 +14,19 @@ export default function Today() {
   const [data, setData] = useState<TodayResponse | null>(null);
   const [leaving, setLeaving] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState<Set<string>>(new Set());
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const keys = useRef(new Map<string, string>()); // (lead:step:kind) -> idempotency key
 
   const load = async () => {
     if (!active) return;
-    setData(await api.today(active.id));
+    try {
+      setData(await api.today(active.id));
+      setLoadErr(null);
+    } catch (e: any) {
+      setData(null);
+      setLoadErr(e?.message ?? String(e));
+    }
   };
   useEffect(() => {
     load().catch(() => undefined);
@@ -87,6 +95,7 @@ export default function Today() {
   }
 
   if (!active) return <p className="text-brand-muted">No campaign yet. <Link className="underline" to="/campaigns/new">Create one.</Link></p>;
+  if (loadErr) return <LoadProblem message={loadErr} />;
   if (!data) return <p className="text-brand-muted">Loading…</p>;
 
   return (

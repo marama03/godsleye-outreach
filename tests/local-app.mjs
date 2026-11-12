@@ -223,6 +223,52 @@ try {
     check("deleting twice is a clean 404", w3.status === 404);
   }
 
+  // 11. impossible sequences are refused with a reason (the sync agent and the sheet write through the same API)
+  {
+    const c2 = await post("/api/campaigns", { name: "Rules test", icp_sentence: "x", chain_id: "gtm", chain_version: 1, daily_cap: 10, start_date: utcDay(-5) });
+    const rid = c2.body.campaign.id;
+    const base0 = { campaign_id: rid, is_demo: true, title: "T", company: "Co", segment: "t", withdrawn_at: null, do_not_contact: false, dossier_path: "x.md", reply_status: "none" };
+    const lf = { ...base0, lead_id: "r_found", name: "Found", linkedin_url: "https://example.invalid/f", invited_at: null, accepted_at: null };
+    const li = { ...base0, lead_id: "r_inv", name: "Invited", linkedin_url: "https://example.invalid/i", invited_at: iso(-3), accepted_at: null };
+    const la = { ...base0, lead_id: "r_acc", name: "Accepted", linkedin_url: "https://example.invalid/a", invited_at: iso(-6), accepted_at: iso(-5) };
+    const cur = JSON.parse(readFileSync(join(DATA, "leads.json"), "utf8"));
+    writeFileSync(join(DATA, "leads.json"), JSON.stringify([...cur, lf, li, la], null, 2));
+    const ev = (lead_id, kind, extra = {}, key) => post("/api/events", { campaign_id: rid, lead_id, kind, idempotency_key: key ?? `rules-${lead_id}-${kind}-${JSON.stringify(extra)}`, ...extra });
+    const refused = async (name, r) => check(name, r.status === 400 && typeof r.body.error === "string" && r.body.error.length > 10, r);
+    await refused("sent on a never-invited lead is refused", await ev("r_found", "sent", { step: 1 }));
+    await refused("skipped step 7 on a fresh lead is refused", await ev("r_found", "skipped", { step: 7 }));
+    await refused("a reply from a never-invited lead is refused", await ev("r_found", "replied"));
+    await refused("withdrawing a never-invited lead is refused", await ev("r_found", "withdrawn"));
+    await refused("an answer with no reply waiting is refused", await ev("r_acc", "sent", { payload: { answered: true } }));
+    await refused("sent on an invited-but-not-accepted lead is refused", await ev("r_inv", "sent", { step: 1 }));
+    await refused("a withdrawn-after-accept makes no sense and is refused", await ev("r_acc", "withdrawn"));
+    await refused("step 2 before step 1 is refused", await ev("r_acc", "sent", { step: 2 }));
+    check("step 1 on an accepted lead is allowed", (await ev("r_acc", "sent", { step: 1 })).status === 201);
+    await refused("step 1 a second time (new key) is refused", await ev("r_acc", "sent", { step: 1 }, "rules-again"));
+    await refused("skipping an already-sent step is refused", await ev("r_acc", "skipped", { step: 1 }));
+    check("skipping the next step is allowed", (await ev("r_acc", "skipped", { step: 2 })).status === 201);
+    // undo guard
+    const ia = await ev("r_inv", "accepted");
+    check("accepting an invited lead is allowed", ia.status === 201);
+    const sa = await ev("r_inv", "sent", { step: 1 });
+    check("then step 1 is allowed", sa.status === 201);
+    const uBad = await post(`/api/undo/${ia.body.event.event_id}`, {});
+    check("undoing the accept while a send is logged is refused", uBad.status === 400 && /later action/.test(uBad.body.error), uBad);
+    check("undoing the newest action is allowed", (await post(`/api/undo/${sa.body.event.event_id}`, {})).status === 201);
+    check("then undoing the accept is allowed", (await post(`/api/undo/${ia.body.event.event_id}`, {})).status === 201);
+    // a campaign whose chain is not installed
+    const camps = JSON.parse(readFileSync(join(DATA, "campaigns.json"), "utf8"));
+    camps.find((c) => c.id === rid).chain_id = "nochain";
+    writeFileSync(join(DATA, "campaigns.json"), JSON.stringify(camps, null, 2));
+    const g1 = await fetch(base + `/api/campaigns/${rid}`);
+    const g1b = await g1.json();
+    check("a missing chain is a clear 409, not a 500", g1.status === 409 && g1b.code === "chain_missing" && /not installed/.test(g1b.error), g1b);
+    check("today and workday say the same", (await fetch(base + `/api/today?campaign=${rid}`)).status === 409 && (await fetch(base + `/api/workday?campaign=${rid}`)).status === 409);
+    check("the campaign list still works", (await get("/api/campaigns")).some((c) => c.id === rid));
+    const dl = await fetch(base + `/api/campaigns/${rid}`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm: "Rules test" }) });
+    check("and such a campaign can still be deleted", dl.status === 200);
+  }
+
   const files = ["campaigns.json", "leads.json", "events.json"].every((f) => { try { JSON.parse(readFileSync(join(DATA, f), "utf8")); return true; } catch { return false; } });
   check("data files are valid JSON on disk", files);
 } catch (e) {
