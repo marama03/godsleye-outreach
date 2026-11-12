@@ -71,7 +71,7 @@ to write for someone who was never prioritised — say this, in these words or c
 > not exist in this workspace yet. Create an agent with exactly that display
 > name and give it the file `linkedin-strategy-prioritizer.md` — paste it into its instructions, or
 > send it as its first message with "read this and follow it from now on". Then give it your sheet's
-> `/exec` URL and token. Until it exists, I can write for one person if you tell me the route yourself:
+> link to your sheet. Until it exists, I can write for one person if you tell me the route yourself:
 > attention or nurture, in one line, and I will treat that as the verdict.
 
 **The whole chain, for your own reference:**

@@ -71,7 +71,7 @@ single line saying the contact is archived and why, so it can close the row.
 > The next agent in the chain is called **LinkedIn Outreach Copywriter**, and it does not exist in this
 > workspace yet. Create an agent with exactly that display name and give it the file
 > `linkedin-outreach-copywriter.md` — paste it into its instructions, or send it as its first message
-> with "read this and follow it from now on". Then give it your sheet's `/exec` URL and token. Until it
+> with "read this and follow it from now on". Then give it the link to your sheet. Until it
 > exists I will record my verdict in the dossier's row in `Notes` and tell you, so nothing is lost —
 > but no message will be written.
 >

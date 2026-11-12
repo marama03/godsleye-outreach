@@ -2,28 +2,28 @@
 
 *God's L'Eye — GenTeam (Genspark) Edition*
 
-From a copy of the sheet to your first message sent. Follow it in order. Steps marked **you** cannot
-be done by an agent. `godsleye-start-here.md` explains why each step exists; this is the checklist.
-On a first setup, give that file to an agent called **God's L'Eye Guide** and let it run this list with
-you, one step at a time — this page is what you come back to the second time, or when you want the
-shape of it at a glance.
+From a sheet to your first message sent. Follow it in order. Steps marked **you** cannot be done by an
+agent. `godsleye-start-here.md` explains why each step exists; this is the checklist. On a first setup,
+give that file to an agent called **LinkedIn Prospect Scout** and let it run this list with you, one
+step at a time — this page is what you come back to the second time, or when you want the shape of it
+at a glance.
 
 ---
 
 ## Part 1 — Make it yours (about ten minutes, once)
 
-1. **Copy the template sheet** into your own Drive. `File → Make a copy`.
-2. **Open the copy's script editor** and paste the script over the placeholder. Save.
-3. **Run the `setup` function** once. It writes the header row, installs the dropdowns, creates the
-   `Messages` and `Events` tabs and the on-edit trigger, and prints a token. Authorising your own
-   unpublished script is expected. When it finishes, the header should be unchanged and two new tabs
-   should exist.
-4. **Deploy it as a web app**: execute as you, access "Anyone". Copy the URL that ends in `/exec`.
-   The token is the only password — treat the pair as one, and do not post them anywhere public.
-5. **Open the dashboard** and paste the URL and the token when it asks. It keeps them in your browser;
-   you should not have to do this again.
-6. **Check it is alive**: open `<your /exec URL>?token=<your token>` in a browser. You should see
-   `{"rows":[]}`. An error here is worth ten minutes now rather than on a client call.
+1. **Have your sheet built.** Give the template link to the Scout as the shape you want, and let it
+   create your own spreadsheet: `Pipeline` with the twenty-two column header, plus an `Events` log.
+   Nothing is copied by hand unless the agent cannot create files in your Drive (section 6 of the
+   manual is the fallback).
+2. **Approve Google Drive for your agent.** The first time it touches Google it asks you to connect
+   Drive. Approve it once, on your own account. That approval is the only credential in the system:
+   no script, no deployment, no token, nothing to paste.
+3. **Open the dashboard** (`npm install`, `npm run dev` in `app/`). It has no Google credential of its
+   own — it reads and writes local files on the same machine and never talks to Google.
+4. **Give the Tracker the sheet link** in its conversation, with the words *"This is my sheet. Keep it
+   in your notes."* It confirms the header shape and reports the row count. That reply is your
+   equivalent of a health check: if it cannot read the sheet, you hear it now, not on a client call.
 
 ## Part 2 — Create the five agents (you)
 
@@ -49,9 +49,11 @@ what to do if it is wrong — which, in the worst case, is to delete the agent a
 - Or send the README as the agent's first message with: *"Read this and follow it from now on."*
   Agents keep their own notes, so they carry it forward.
 
-**Then give it your sheet.** Every agent gets the same two things in the same conversation: the `/exec`
-URL and the token, with the words *"This is my sheet. Keep these in your own notes and never repeat
-them."* They are a password, which is why they are not written inside the READMEs.
+**Then give it your sheet.** The Tracker is the one agent that reads and writes the sheet, and it is
+given the link — never a password, because there is no password in this design. The other four reach
+the sheet through it: the Scout appends prospect rows, the Researcher attaches a dossier link, the
+Prioritizer and the Copywriter read what they need. If you are giving a second agent the link directly,
+tell it plainly that it may read but that only the Tracker writes state.
 
 **Then make it say its job back.** *"In one line: what is your job, who wakes you, and who do you
 wake?"* If the answer is wrong, fix it now. While you are still creating them, the agent after it will
@@ -100,7 +102,7 @@ plausible guess.
 3. **You** set `Accepted?` to `Yes` when someone accepts. `Accepted At` and `Research Status = queued`
    fill in on their own. That is the only tick the system needs from you, and it is what starts the
    research.
-4. **Press Sync** on the dashboard (or say "process accepted" to LinkedIn Outreach Tracker). LinkedIn Outreach Tracker sweeps,
+4. **Ask for a pass** — say "run a pass" to LinkedIn Outreach Tracker (there is nothing to press: the dashboard has no sheet connection of its own). LinkedIn Outreach Tracker sweeps,
    stamps the batch `dispatched`, and wakes LinkedIn Intel Researcher once for the whole batch.
 5. **Wait for the dossier and the verdict.** LinkedIn Intel Researcher writes the dossier and sets `Dossier URL`
    and `Hook Theme`; LinkedIn Outreach Tracker moves the row to `ready`. LinkedIn Strategy Prioritizer scores it, routes it, and

@@ -70,7 +70,7 @@ Use that exact name and pick it from the mention list. Never a nickname, never a
 > The next agent in the chain is called **LinkedIn Strategy Prioritizer**, and it does not exist in
 > this workspace yet. Create an agent with exactly that display name and give it the file
 > `linkedin-strategy-prioritizer.md` — paste it into its instructions, or send it as its first message
-> with "read this and follow it from now on". Then give it your sheet's `/exec` URL and token. Until it
+> with "read this and follow it from now on". Then give it the link to your sheet. Until it
 > exists I will finish and save each dossier, set `Dossier URL` and `Hook Theme`, and hold the handoff,
 > so nothing is lost — but nothing will be prioritised.
 

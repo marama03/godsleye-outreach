@@ -73,7 +73,7 @@ row is stuck. Then say, in these words or close to them:
 > The next agent in the chain is called **LinkedIn Outreach Tracker**, and it does not exist in this
 > workspace yet. Create an agent with exactly that display name, and give it the file
 > `linkedin-outreach-tracker.md` — paste it into its instructions, or send it as its first message
-> with "read this and follow it from now on". Then give it your sheet's `/exec` URL and token. Until it
+> with "read this and follow it from now on". Then give it the link to your sheet. Until it
 > exists, nothing after the invitation will happen: the rows will sit at `queued` and no one will pick
 > them up.
 

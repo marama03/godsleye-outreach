@@ -5,13 +5,19 @@
 For you, on demo day. Every click you make, the sentence you say while you make it, and what to do
 if it does not do what it should. Read the fallback line at the bottom once before you start.
 
-**One thing to know before you click.** As of this writing, no click has touched a live sheet yet.
-The sheet loop is built and tested against a simulator, not against a deployed sheet. So the
-honest position on stage is: the sequence below is the sequence; if a step does not answer, say the
-fallback sentence and keep moving. Do not debug on stage.
+**One thing to know before you click.** The sheet is written by an agent, not by a script — so there is
+a beat in this demo that older versions did not have: after you tick, or after you mark a send, you ask
+for a pass and the write lands a few seconds later, in front of them. Say that out loud when it happens.
+It is the design, not a delay, and it is more convincing than an instant stamp because they can watch
+the agent do it.
 
-The six clicks, for glancing at: **open the sheet → tick Accepted? → Sync → open the dossier → copy a
-variant → mark sent and show the sheet recording it.**
+The agent-side round trip is proven on a disposable sheet: rows pulled, a send pushed, a second pass
+that wrote nothing, two bad edits reported rather than overwritten. What is not proven is this
+machine's live sheet — so if a write does not land, say the fallback line and keep moving. Do not debug
+on stage.
+
+The six beats, for glancing at: **open the sheet → tick Accepted? → ask for a pass → open the dossier
+→ copy a variant → mark sent, ask for a pass, show the row.**
 
 ---
 
@@ -46,30 +52,31 @@ tabs and say: "I'll show you the dashboard instead" and go to step 4.
 **Say:** "A prospect accepted my connection request. I am the only one who can know that, so that
 is the one thing I type. Watch this cell."
 
-**What should happen:** the Accepted At cell fills with a timestamp, and Research Status fills with
-`queued`. That is the sheet noticing for itself, not me.
+**What should happen:** nothing yet — and that is the honest thing to point at. Say: "The sheet does
+not watch itself. The agent does." Then ask, in the room, in one line: *"Tracker: run a pass."* Watch
+the row: `Accepted At` fills with a timestamp and `Research Status` goes to `queued`.
 
-**If nothing fills:** do not touch it again. Say: "It stamps on its own; the write goes through the
-script behind the sheet, and I'll come back to that." Move to step 3 — the Sync press does not
-depend on the stamp.
+**If nothing fills:** do not touch it again. Say: "The agent writes this, and it has not had its pass
+yet — that is the next click." Move to step 3, which asks for the pass properly.
 
 ---
 
-## 3. Press Sync
+## 3. Ask for a pass
 
-**Click:** Sync on the dashboard.
+**Click:** nothing. One line in the room: *"Tracker: run a pass."*
 
-**Say:** "That press wakes the pipeline agent. It reads the sheet, finds
-the row I just queued, and hands it to research. Everything after this is the machine's work; the sheet
-is where I can see it happened."
+**Say:** "That sentence wakes the pipeline agent. It reads the sheet, finds the row I just queued, and
+hands it to research. Everything after this is the machine's work; the sheet is where I can see it
+happened."
 
 **What should happen:** the row's Research Status moves `queued` to `dispatched`, then to `ready`, and
 the dossier appears on the row. On a live run this takes the length of a research turn, so in the demo
 the research for this person is already done — the press shows the row landing on the dashboard, and
 the dossier is already there.
 
-**If Sync errors or the row does not appear:** say the fallback line (below) and go straight to
-step 4 using the person you prepared in advance.
+**If the row does not move:** say the fallback line (below) and go straight to step 4 using the person
+you prepared in advance. Do not press Sync on the dashboard: with no script configured it has nothing
+to talk to, and a dead button on stage costs more than the row.
 
 ---
 
@@ -108,13 +115,12 @@ button, only on the words being there.
 
 ## 6. Mark sent, and show the sheet recording it
 
-**Click:** I posted it, on that card. Then switch to the sheet.
+**Click:** I posted it, on that card. Then say this before switching: *"One tap told the system what I
+did. The sheet catches up when the agent next passes, and that is now."* Ask for a pass in one line:
+*"Tracker: run a pass."*
 
-**Say:** "One tap. I have told it what I did. Now watch the sheet, because this is the part that
-makes the whole thing trustworthy."
-
-**Point at, on the same row:** Variant (which message went), Sent At (when), Stage (`day4`), and
-Next Due (four days out).
+**Point at, on the same row, once it lands:** Variant (which message went), Sent At (when), Stage
+(`day4`), and Next Due (four days out).
 
 **Say:** "I never touch those four columns. The system wrote them, from one tap, and it wrote them
 into the sheet, not into some database you cannot see. On day four this person comes back to the top of
@@ -131,10 +137,9 @@ fallback line.
 
 Use this, word for word, if any sheet write does not happen:
 
-> "The sheet is the part I have not switched on live yet. The sequence you just watched is real,
-> and every one of those writes is tested, but the thing that connects this dashboard to that sheet
-> is a deployment on my own Google account and I have not pressed it. So what I am showing you is
-> the design working, not the wire being live. That is a ten minute job, and it is mine, not yours."
+> "The sheet is the part that is not wired to this account yet. The sequence you just watched is real,
+> and every one of those writes is proven against a real sheet, but this particular sheet has not been
+> given to the agent. That is one line of setup, and it is mine, not yours."
 
 Then keep going. Do not apologise twice and do not offer to fix it on stage.
 
