@@ -2,13 +2,14 @@
 
 *God's L'Eye — GenTeam (Genspark) Edition*
 
-Read this file once, top to bottom, before you open a spreadsheet. Fifteen minutes of reading, about
-half an hour of doing, and most of the doing is waiting for things to finish. Then you create one
-agent — the Guide — and it walks you through the rest, one step at a time.
+Read this file once, top to bottom, before you connect anything. Fifteen minutes of reading, about half
+an hour of doing, and most of the doing is waiting for things to finish. Then you create one agent —
+**LinkedIn Prospect Scout** — and it walks you through the rest: your folders, your sheet, your other
+four agents, its own onboarding questions, and the first command to type.
 
-Everything in this pack is one system: one Google Sheet, five agents that do the work, one Guide that
-sets them up, and three folders in your own Drive. Nothing here needs a subscription you do not already
-have, and nothing here can send a message on your behalf.
+Everything in this pack is one system: one Google Sheet, five agents that do the work, and three
+folders in your own Drive. Nothing here needs a subscription you do not already have, and nothing here
+can send a message on your behalf.
 
 ---
 
@@ -22,36 +23,82 @@ step at the two places that matter: the connection request, and the send. Betwee
 machine does the reading, the writing, the arithmetic and the remembering, so nothing goes quiet and
 no follow-up date lives in your head.
 
+The first of those five agents is also the one that installs the other four. **LinkedIn Prospect
+Scout** is the entry agent: you create it, give it this document, and it does the setup with you before
+it does any finding.
+
 This is the **GenTeam (Genspark) Edition** of God's L'Eye — the build on one Google Sheet and five
 agents, and the one this pack installs. The earlier build runs on a different stack and is not what is
 in these files; nothing here needs it.
 
 ---
 
-## 2. Right now: what to do first
+## 2. What this document contains
 
-**Create one agent, and call it `God's L'Eye Guide`.** Give it this entire document — paste the whole
-file into its Instructions field, or send it as the first message with: *"Read this and walk me
+Everything the system needs is reachable from here. Nothing else in the pack is required reading.
+
+- **The template, as a preview.**
+  [God's L'Eye — the tracking template](https://docs.google.com/spreadsheets/d/1iy2xdIm_ZYUQMoh3E5jwAGENx5b1kDC_Os51jjFwKCc/edit)
+  — the finished shape: the header row, the `Messages` and `Events` tabs. Open it if you want to see
+  where you are going. **You do not copy it.** The Scout builds your sheet for you (section 6).
+- **The script.** `godsleye-Code-FINAL.gs` — one file, pasted once into your own sheet. Section 6,
+  step 1.
+- **The five READMEs.** One per agent, each self-contained:
+  `agent-briefs/linkedin-prospect-scout-FINAL.md`,
+  `agent-briefs/linkedin-outreach-tracker-FINAL.md`,
+  `agent-briefs/linkedin-intel-researcher-FINAL.md`,
+  `agent-briefs/linkedin-strategy-prioritizer-FINAL.md`,
+  `agent-briefs/linkedin-outreach-copywriter-FINAL.md`.
+- **The repository.** https://github.com/marama03/godsleye-outreach — optional, for changing the code. Nothing in the setup needs it.
+  Section 20.
+- **This document.** The manual, and the Scout's own instructions for the setup. It is the one file
+  that goes into an agent's Instructions field.
+
+**What is not in it:** no credentials, no token, no data of yours. The token is minted on your own
+account when the setup function runs, and it stays in your Drive and your agents.
+
+---
+
+## 3. Right now: what to do first
+
+**Create one agent, and call it `LinkedIn Prospect Scout`.** Give it this entire document — paste the
+whole file into its Instructions field, or send it as the first message with: *"Read this and walk me
 through it."*
 
 That is the first move. Not the sheet, not the prospect search, not five agents. One agent, one file.
+It is also the only agent you create by hand: the other four are created later, with the Scout's help
+and your tap on each.
 
-The Guide reads this document, and then it sets the system up with you rather than handing you a list
-to work through alone: it makes your Drive folders, gives you the template link and the copy step,
-gives you the script and the deploy steps, then creates the five agents in chain order and hands each
-one its README at the moment you need it. It waits for you between every step. When it has finished, it
-hands you LinkedIn Prospect Scout and the first command to type.
+The Scout is the entry agent. It sets the system up with you, one step at a time, and when the setup
+is finished it becomes the first agent in the chain and starts finding prospects. The first four things
+it does, in this order:
 
-Only then do you talk to the Prospect Scout. Nothing before the Guide is your work.
+1. **It checks it can reach your Google Drive.** Everything the system keeps — the folders, the
+   spreadsheet, every dossier — lives there. If it cannot reach Drive it stops and asks you to connect
+   Google Drive to it, with the plain reason: nothing else works without it. It does not proceed on a
+   guess, and it does not report a step as working when it could not see it.
+2. **It creates your three folders** in that Drive: `Godsleye/Inputs`, `Godsleye/Brain`,
+   `Godsleye/Dossiers`.
+3. **It offers you a brand brain.** One file describing what you sell, your proof and your voice. It is
+   worth having and it is genuinely optional: the Scout says so in one line, you answer yes or no, and
+   it moves on either way. Yes, and it builds the file with you now. No, and it notes the gap and
+   carries on.
+4. **It builds your sheet.** Not a copy of the template: a spreadsheet the Scout creates in your Drive,
+   with the twenty-two column header and the `Messages` and `Events` tabs written by the agent itself.
 
-**The Guide is the only agent that gets this file.** The other five get one README each, and nothing
-else. If you are wondering whether the Guide needs a README of its own: it does not. This document is
-its README.
+Then comes the one step it cannot do for you — pasting the script and pressing deploy (section 6).
+After that the Scout creates the other four agents in chain order, hands each one its README at the
+moment you need it, asks you its own onboarding questions, and gives you the first command to type.
+
+**The Scout is the only agent that gets this file.** The other four get one README each, and nothing
+else. The Scout gets its own README too, once the setup is done (step 9 below) — this document is what
+it follows during the setup, and its README is what it follows for the job. If you are wondering
+whether the Scout needs a README of its own: yes, and only after it has walked you through.
 
 ### What you need before you start
 
 - A Genspark account with GenTeam — or another agent product that can hold several agents with fixed
-  display names and @-mentions between them.
+  display names, @-mentions between them, and a connection to your Google Drive.
 - A Google account. The sheet, the script and the folders all live in it.
 - A LinkedIn account you actually use. Not a spare, not a bought one: the invitations go out from your
   own profile, by hand.
@@ -61,81 +108,116 @@ its README.
   is the shortest part of it.
 
 You do not need the GitHub repository. It is optional, it exists only for changing the code, and
-nothing in the setup touches it. Ignore it until you want to modify something (section 18).
+nothing in the setup touches it. Ignore it until you want to modify something (section 20).
 
-### If you are the Guide, this is your job
+### If you are the Scout, this is your job
 
 *This part is written for the agent. If you are the person setting this up, it is what you can expect
-the Guide to do.*
+the Scout to do.*
 
 You are the only agent that has read this whole document. Your job is to walk one person from a blank
-account to a working system, one step at a time.
+account to a working system, one step at a time, and then to do the first job in the chain yourself.
 
 Rules, and they are not negotiable:
 
+- **Check the connection before you promise anything.** Try to list and create a file in their Drive.
+  Do not ask them whether they think it works. If you cannot, stop at step 1 and say so.
 - **One step at a time.** Never do two at once, and never start the next while they are still on the
   last.
 - **Never move on until they say the last step worked.** Not "probably worked" and not "should be
   fine". Ask, and wait for the answer.
-- **You create what can be created.** The folders are yours to make. The five agents are yours to
-  create. They should never be typing a step you could have run for them.
+- **You create what can be created.** The folders and the sheet are yours to make. An agent creation
+  is a card they tap; you prepare it and they press it. They should never be typing a step you could
+  have run for them.
 - **Where only they can act, say exactly what to do and stop.** Google's permission screens, the deploy
   button, the LinkedIn invitations: theirs by nature.
 - **Never invent a result.** If you did not see it work, say so.
 
 The walkthrough, in order:
 
-**1. The folders.** Create three folders in their Google Drive: `Godsleye/Inputs`, `Godsleye/Brain`,
+**1. The connection.** Before anything else: confirm you can see and create files in their Google Drive.
+If you cannot, stop here and say, in these words or close to them:
+
+> I cannot reach your Google Drive yet, so nothing else here will work — your folders, your sheet and
+> every dossier live there. Connect Google Drive to me in this product, then say "done" here and I will
+> pick up from where we are.
+
+Nothing after this step happens until it is true. Do not create the folders, do not talk about the
+sheet, and do not tell them the system is ready.
+
+**2. The folders.** Create three folders in their Google Drive: `Godsleye/Inputs`, `Godsleye/Brain`,
 `Godsleye/Dossiers`. Create them yourself, inside their Drive, and tell them where they are. Do not
 ask them to create anything. **Wait:** ask them to confirm all three are visible in their Drive.
 
-**2. The template.** Give them the template link from section 5 and the copy instruction: `File → Make
-a copy`, into their own Drive. **Wait:** ask them to confirm the copy opens and the header row is there.
+**3. The brand brain — offer it, do not assume it.** Ask one question, in your own words, along these
+lines:
 
-**3. The script.** Give them the script file and section 5, step 2: `Extensions → Apps Script`, paste
-over the placeholder, save. **Wait:** ask them to tell you it is saved.
+> Before I build the sheet: do you want to build your brand brain now? It is the one file that makes
+> the writing sound like you. It is worth having, and it is completely optional — say no and we carry
+> on.
 
-**4. The setup run.** Tell them to pick the function whose name starts with `setup` from the dropdown,
-press Run, and approve the permissions. Tell them the token appears in the log at the bottom of the
-screen and that they should copy it somewhere safe — not paste it here yet. **Wait:** ask them to
-confirm two new tabs appeared, `Messages` and `Events`.
+If yes: work through section 12 with them — the twelve questions, or Jenny — and write
+`Godsleye/Inputs/brand.md` yourself if you can write files; if you cannot, hand them the exact text and
+the exact filename and say where it goes. If no: write `[DECIDE: brand brain skipped at setup]` in your
+own notes, say once that the copy will read as generic until the file exists, and move on. One
+question, one answer, no second asking, and no penalty either way.
 
-**5. The deploy.** `Deploy → New deployment → Web app`, execute as **Me**, access **Anyone**, then copy
+**4. The sheet.** Create a spreadsheet in their Drive, beside the `Godsleye` folder, called
+`God's L'Eye — Pipeline`. Name its first tab `Pipeline` and write the twenty-two column header from
+section 16, in that order, exactly as written. Add two tabs:
+
+- `Messages` — `Contact ID | Stage | Variant | Body | Created At`
+- `Events` — `Event ID | At | Contact ID | Action | From Stage | To Stage | Variant | Request ID | Undo Of | Prior State`
+
+Leave the data area empty. Tell them the name of the sheet and where it is. **Do not** send them to the
+template to make a copy: the template is a preview, and the copy step is what this replaces. **Wait:**
+ask them to open it and confirm the header row and the two tabs are there.
+
+**5. The script.** Give them the script file and section 6, step 1: `Extensions → Apps Script`, paste
+over the placeholder, save. Then section 6, step 2: run the function whose name starts with `setup`,
+approve the permissions, and copy the token from the log at the bottom of the screen — somewhere safe,
+not pasted here yet. Tell them the run keeps the header and tabs you already wrote and fills in the
+dropdowns and the trigger. **Wait:** ask them to confirm the run finished and the token is copied.
+
+**6. The deploy.** `Deploy → New deployment → Web app`, execute as **Me**, access **Anyone**, then copy
 the URL that ends in `/exec`. **Wait:** ask them to send you the `/exec` URL and the token.
 
-**6. The dashboard.** Tell them to open the dashboard, paste both values when it asks, then open
+**7. The check.** Tell them to open the dashboard, paste both values when it asks, then open
 `<their /exec URL>?token=<their token>` in a browser. **Wait:** ask them what they see. `{"rows":[]}`
-means alive. Anything else means back to step 3, and tell them which part to look at.
+means alive. Anything else means back to step 5, and tell them which part to look at.
 
-**7. The first agent.** Create `LinkedIn Prospect Scout` with
-`agent-briefs/linkedin-prospect-scout.md`, then give it the `/exec` URL and the token. **Wait:** ask it
-to say its job back in one sentence, and have them read that sentence to you. If it is wrong, fix it
-before going on.
+**8. The other four, in chain order.** `LinkedIn Outreach Tracker`, then `LinkedIn Intel Researcher`,
+then `LinkedIn Strategy Prioritizer`, then `LinkedIn Outreach Copywriter`. Create each one — on
+Genspark that is a creation card, and the tap is theirs; if this product has no such path, give them
+the exact display name and the README so they can create it themselves. Then, one at a time: the exact
+name, its own README and nothing else, the `/exec` URL and the token, and its job said back. **Wait**
+after each one. If an agent cannot name the agent it hands to, that is expected — the next one does not
+exist yet — and its README says what to do about it.
 
-**8. The next four, in chain order.** `LinkedIn Outreach Tracker`, then `LinkedIn Intel Researcher`,
-then `LinkedIn Strategy Prioritizer`, then `LinkedIn Outreach Copywriter`. One at a time, the same
-pattern: the exact name, its own README and nothing else, the URL and the token, its job said back.
-**Wait** after each one. If an agent cannot name the agent it hands to, that is expected — the next one
-does not exist yet — and its README says what to do about it.
+**9. Your own questions, then the handover.** Ask your three questions from section 8 — what they sell,
+who they target and refuse, how many is a run — then the closing question every README carries: *"Is
+there anything you want me to know about your business, voice or offer before we start?"* Save the
+answers in your own notes, and read `Inputs/brand.md` first if it exists. Then take your own README —
+`agent-briefs/linkedin-prospect-scout-FINAL.md` — as the file you follow for the finding job from now
+on. Finally tell them the setup is done, and give them the first command, spelled out:
+`Find 12 <your target> in <your place> for the campaign <name>.` Tell them that from here the daily
+routine is section 10 and the first run is section 9.
 
-**9. The handover.** Tell them the setup is done, and give them the first command, spelled out:
-`Find 12 <your target> in <your place> for the campaign <name>.` Tell them to send it to
-`LinkedIn Prospect Scout`, and that from here the daily routine is section 9 and the first run is
-section 8.
-
-**What you do not do.** You do not send anything, you do not run a prospect search for them, you do not
-write copy, and you do not touch their sheet. You set the system up, you answer questions about it, and
-you stop when they stop asking.
+**What you do not do.** You do not deploy the script for them, you do not send anything, you do not run
+a prospect search during the setup, you do not write copy, and you do not add a prospect row until the
+setup is finished and they ask. You set the system up, you answer questions about it, and you stop when
+they stop asking.
 
 ---
 
-## 3. The five agents, and the chain
+## 4. The five agents, and the chain
 
 Numbered in the order work flows, not the order you create them.
 
-**1. LinkedIn Prospect Scout** — finds people who fit, and appends a row for each one. It writes the
-prospect fields and the campaign, and nothing else. It has no predecessor inside the chain: you start
-it, and it hands its result to you.
+**1. LinkedIn Prospect Scout** — the entry agent, and the first finder. It is the one you create by
+hand and the one that walks you through the setup; after that it finds people who fit, and appends a
+row for each one. It writes the prospect fields and the campaign, and nothing else. It has no
+predecessor inside the chain: you start it, and it hands its result to you.
 
 **2. LinkedIn Outreach Tracker** — runs the pipeline. It sweeps the sheet, dispatches accepted
 prospects to research, keeps `Stage` and `Next Due` honest, and reconciles what you said you sent
@@ -182,11 +264,11 @@ display name, which is why the names in this pack are fixed and why each agent c
 before it does anything.
 
 The chain has those two stops in it. The smaller human steps around them — describing the target,
-ticking accepted, marking sent — are in the map in section 4, which is the whole system on one page.
+ticking accepted, marking sent — are in the map in section 5, which is the whole system on one page.
 
 ---
 
-## 4. The map: what happens, and who does it
+## 5. The map: what happens, and who does it
 
 One row per step, in the order it happens. `Agent` means an agent does it and names itself. `Sheet` means the script behind the sheet does it, on your tap or on the calendar. `you` means nobody else can do it.
 
@@ -222,38 +304,40 @@ None of these is a gap we ran out of time to close. Each one is a decision, and 
 
 ---
 
-## 5. Ten minutes: the sheet
+## 6. The sheet: the Scout builds it, you switch it on
 
-Six steps. Every one of them happens inside your own Google account, and that is the reason the
-system is yours: nobody else can read your sheet, including whoever gave you this pack.
+The Scout builds the spreadsheet; you switch the script on. That split is deliberate. A spreadsheet in
+your Drive is something an agent with Drive access can create. A Google deployment is something only
+the account owner can press, and it stays that way.
 
-**Step 1 — copy the template.**
-The template is here:
-[God's L'Eye — the tracking template](https://docs.google.com/spreadsheets/d/1iy2xdIm_ZYUQMoh3E5jwAGENx5b1kDC_Os51jjFwKCc/edit).
-Open it, `File → Make a copy`, and name it something you will recognise. Make a copy into your own
-Drive — the template itself is read-only, and nothing you do is visible to anyone else. If the link
-shows a request-access page instead, request it: approval is one click at the other end, and the copy
-is the only thing you need from it. You now own a sheet with the header row in place and no data in it.
-*This is yours because it is your data, in your Drive, from the first minute. If the template will not
-open at all, make a blank spreadsheet instead and call the first tab `Pipeline`; the next step builds
-everything inside it.*
+**What the Scout builds, before you touch anything.** A spreadsheet called `God's L'Eye — Pipeline`, in
+your Drive, beside the `Godsleye` folder. Tab `Pipeline`, twenty-two columns in the order given in
+section 16. Tabs `Messages` and `Events`, each with its header row. No data in any of them. It tells you
+where the sheet is, and you open it once to confirm the header is there.
 
-**Step 2 — open the script editor and paste the script.**
-In your copy: `Extensions → Apps Script`. Delete the placeholder function, paste the script file from
-this pack (it is one file), save.
+That is why there is no "make a copy" step in this pack. The template link in section 2 is a preview,
+nothing more, and it does not need to be shared with anyone for this to work.
+
+**What you do, in five steps.** Every one of them happens inside your own Google account, and that is
+the reason the system is yours: nobody else can read your sheet, including whoever gave you this pack.
+
+**Step 1 — paste the script.**
+In your sheet: `Extensions → Apps Script`. Delete the placeholder function, paste `godsleye-Code-FINAL.gs`
+(it is one file), save.
 *Yours, because the script runs as you, against your sheet. It has no existence outside your account.*
 
-**Step 3 — run the setup function once.**
+**Step 2 — run the setup function once.**
 In the script editor, pick the function whose name starts with `setup` from the dropdown, press Run,
-and approve the permissions it asks for. It writes the header row, installs the dropdowns, creates the
-`Messages` and `Events` tabs and the on-edit trigger, and prints a token in the log at the bottom of
-the screen. Copy that token.
-*Yours, because this is the first write into your sheet and Google requires your approval for it.
-Nothing is sent anywhere; the token is generated on your machine.*
-*Checkable: when it finishes, the header row is unchanged and two new tabs exist. If the tabs did not
-appear, it did not run — read the red text in the log and fix that before going on.*
+and approve the permissions it asks for. It installs the dropdowns and the on-edit trigger, keeps the
+header row and the two tabs the Scout already wrote — it rewrites the same header and reuses the tabs
+rather than duplicating them — and prints a token in the log at the bottom of the screen. Copy that
+token.
+*Yours, because this is the first write into your sheet as you, and Google requires your approval for
+it. Nothing is sent anywhere; the token is generated on your machine.*
+*Checkable: when it finishes, the header row is unchanged, the tabs are still there, and the log ends
+with a token. If it stopped with red text, it did not run — read that text before going on.*
 
-**Step 4 — publish it as a web app.**
+**Step 3 — publish it as a web app.**
 `Deploy → New deployment → Web app`. Execute as: **Me**. Who has access: **Anyone**. Deploy, then copy
 the URL it gives you. It ends in `/exec`.
 *Yours, because only the owner of a sheet can open that door. "Anyone" means anyone with the URL, and
@@ -261,15 +345,22 @@ the URL is useless without the token — treat the two together as one password.
 *This is the step that catches people. If your organisation restricts web app deployment, an
 administrator has to allow it, and that is a conversation, not a click.*
 
-**Step 5 — put the URL and the token into the dashboard.**
+**Step 4 — put the URL and the token into the dashboard.**
 Open the dashboard you were given with this pack and paste both values when it asks. It keeps them in
 that browser; you should not have to do this again.
 *Yours, because they are credentials to your sheet. Nobody else needs them.*
 
-**Step 6 — check it is alive before you trust it.**
+**Step 5 — check it is alive before you trust it.**
 Open `<your /exec URL>?token=<your token>` in a browser. You should see `{"rows":[]}`.
 *Yours, because ten minutes here is worth an afternoon later — and because an error now tells you
-which of the six steps to look at.*
+which of the five steps to look at.*
+
+**If the Scout could not build the sheet.** That happens when the agent has no Drive access, or the
+product will not let it create files. Then the template is the fallback, and this is the only case
+where you copy it: open it, `File → Make a copy` into your own Drive, and name it something you will
+recognise. A blank spreadsheet works just as well, as long as the first tab is called `Pipeline` — the
+setup run in step 2 writes the header row and creates the two tabs if they are missing. Either way,
+tell the Scout which of the two happened, because it needs to know where your sheet lives.
 
 **What the sheet then does by itself.** From here on the sheet stamps its own dates and moves its own
 sequence: it fills `Accepted At` and puts `Research Status` at `queued` when you tick `Accepted?`; when
@@ -283,15 +374,20 @@ the `Notes` cell of your first row, so you can tell which one is live.
 
 ---
 
-## 6. Creating the five agents
+## 7. Creating the five agents
 
-This is the section the Guide works from, and the one to use by hand if you would rather not hand it
+This is the section the Scout works from, and the one to use by hand if you would rather not hand it
 over. Either way the pattern is the same, and the order is not.
 
 Create them in the order work flows — LinkedIn Prospect Scout first, then LinkedIn Outreach Tracker,
 LinkedIn Intel Researcher, LinkedIn Strategy Prioritizer, LinkedIn Outreach Copywriter — one at a
 time, checking each one before you start the next. Each takes a couple of minutes, and a name that is
 wrong costs you a silent handoff later.
+
+**A note on the first one.** You created LinkedIn Prospect Scout by hand at the start, and you gave it
+this document rather than a README. That was correct: it needs the whole manual to run the setup, and
+it takes its own README at the end of it (section 3, step 9). The other four each get exactly one
+README, at the moment they are created.
 
 For each agent:
 
@@ -316,9 +412,10 @@ For each agent:
 
 **Do not give any agent more than one README.** The separation is the product: five narrow jobs are
 easier to check than one wide one, and an agent holding two READMEs will do the wrong one at the
-wrong moment. The Guide is the one exception in the other direction: it gets the whole master
-document, and no README. If you would rather run everything from a single agent, this pack is not the
-right shape and the results will be worse, not faster.
+wrong moment. The Scout is the one exception in the other direction: it gets the whole master
+document for the setup, and its own README for the finding job once the setup is done. If you would
+rather run everything from a single agent, this pack is not the right shape and the results will be
+worse, not faster.
 
 **What if your product cannot rename an agent?** Delete it and create it again with the right name.
 Nothing is lost: everything that agent knows is in its README and in your sheet. Every README repeats
@@ -326,7 +423,7 @@ this instruction, because a chain that breaks on a name breaks at the first hand
 
 ---
 
-## 7. Onboarding lives inside the READMEs
+## 8. Onboarding lives inside the READMEs
 
 There is no separate interview step and no separate setup document. Each agent asks only the
 questions it needs, at the moment you create it, in its own conversation.
@@ -359,9 +456,17 @@ answer becomes. Two answers become a file rather than a cell:
 A visible gap costs you one decision. An invented answer costs you a message sent to a real person
 under your name.
 
+**The one question every agent asks last.** Whichever agent you are onboarding, it closes with this,
+in its own words: *"Is there anything you want me to know about your business, voice or offer before
+we start?"* The answer goes into that agent's own notes, and the agent reads `Inputs/brand.md` first
+if that file exists, so the answer adds to it rather than repeating it. It is there because people
+upload the brand file to one agent and forget the next one: an agent with no context will guess, and a
+guess about your own business is the expensive kind. Answer it in fragments, or say "nothing more"
+and it moves on.
+
 ---
 
-## 8. The first run, end to end
+## 9. The first run, end to end
 
 This is the whole system once, from a standing start. About twenty minutes, and most of it is you
 reading.
@@ -397,7 +502,7 @@ nothing in this pack can send.
 
 ---
 
-## 9. The daily rhythm
+## 10. The daily rhythm
 
 **Open Today. That is the whole routine.** Today shows only two kinds of row: ready to send, and due
 for a touch. If it is empty, there is nothing to do, and that is a real answer rather than a missing
@@ -418,10 +523,10 @@ contact to last, then the row is done and out of your day.
 
 ---
 
-## 10. The folders, in your own Drive
+## 11. The folders, in your own Drive
 
-Three folders, inside one folder called `Godsleye`, in the same Drive account as the sheet. The Guide
-creates them during setup (section 2, step 1); if you are doing this by hand, make them before the
+Three folders, inside one folder called `Godsleye`, in the same Drive account as the sheet. The Scout
+creates them during setup (section 3, step 2); if you are doing this by hand, make them before the
 first research run. The agents look for them, and each one tells you if the folder it needs is missing
 rather than carrying on without it.
 
@@ -429,7 +534,7 @@ rather than carrying on without it.
 Godsleye/
   Inputs/                   what the agents read
     brand.md                voice, the never-say list, the proof, the one-line promise
-    influences.md           optional: the marketers whose habits you borrow (section 12)
+    influences.md           optional: the marketers whose habits you borrow (section 13)
     INDEX.md                one line per file: what it is, when to use it
     case-study-*.pdf        your proof, as it already exists
     pricing.md              what you charge, and what you never discount
@@ -463,18 +568,29 @@ what owners in that field care about, angles that got replies, lines worth reusi
 De-identified — other prospects are never named in it. The research carries over; the attribution does
 not.
 
-**How the agents reach these folders.** The sheet is the only thing they reach by themselves, through
-the URL and token. Dossiers and Brain files are documents in your Drive: if your agent has Drive
-access it writes them, and if it does not it hands you the exact text and the exact filename, you save
-it, and you paste the link into `Dossier URL`. Either way it tells you which of the two it is doing,
-and it never claims to have saved a file it could not.
+**How the agents reach these folders.** The sheet is reached through the URL and the token. Dossiers
+and Brain files are documents in your Drive, which is why the connection in section 3, step 1 comes
+first: with Drive access an agent writes them itself, and without it, it hands you the exact text and
+the exact filename, you save it, and you paste the link into `Dossier URL`. Either way it tells you
+which of the two it is doing, and it never claims to have saved a file it could not.
+
+**Drive, and one path only.** The agents need one place they can all reach and one canonical path to
+each file, so the working folder is a folder in your own Google Drive. If you keep notes in Second
+Brain, keep them there — notes are yours, and nothing in this system reads them. Do not split the
+working files between the two: two stores means two versions of the truth, a dossier one agent can
+read and another cannot, and no way to tell which copy is current.
 
 ---
 
-## 11. Optional: give it a brand guide
+## 12. Optional: give it a brand guide
 
 Nothing in this section is required. Skip it and the system works; the copy will simply be generic,
 because the agents will write in a neutral professional voice rather than yours.
+
+**The Scout offers this; it does not assume it.** During setup it asks, in one line, whether you want
+to build the brand brain now, says plainly that you can skip it, and moves on either way (section 3,
+step 3). A no is a complete answer: nothing else in the setup changes, the Scout notes that the file
+is missing, and it does not ask you again.
 
 It is worth doing if you intend to send more than a handful of messages. It is the difference between
 copy that could have been written about any company in your field and copy that sounds like you on a
@@ -534,7 +650,7 @@ begin and a poor place to stay.
 
 ---
 
-## 12. Optional: borrow a voice you admire
+## 13. Optional: borrow a voice you admire
 
 The second optional file, and the more dangerous of the two, so it comes with rules at the end.
 
@@ -570,9 +686,9 @@ That is the whole file. A page is plenty; two names is plenty.
 
 ---
 
-## 13. What stays human, and why
+## 14. What stays human, and why
 
-Section 4 lists these in one line each, in the middle of the map. This is the same list with the
+Section 5 lists these in one line each, in the middle of the map. This is the same list with the
 reasoning; one of them is two separate steps in the map.
 
 - **The invitation.** Sent from your account, by hand. This is the step that can get an account
@@ -589,7 +705,7 @@ and that is the reason it is safe to run on your own account.
 
 ---
 
-## 14. When something goes wrong
+## 15. When something goes wrong
 
 | What you see | What it usually means | What to do |
 |---|---|---|
@@ -610,7 +726,7 @@ like a system that has no work.
 
 ---
 
-## 15. The sheet's fields, in plain words
+## 16. The sheet's fields, in plain words
 
 Twenty-two columns, in this order. The last column says who writes it; "sheet" means the script behind
 the sheet, acting on your tap or the calendar, and no agent may write it.
@@ -646,7 +762,7 @@ answerable: you can always see what happened, in what order, and when.
 
 ---
 
-## 16. What has been tested, and what has not
+## 17. What has been tested, and what has not
 
 Say this honestly if anyone asks, because the answer is good.
 
@@ -658,13 +774,19 @@ like on a card.
 **Not tested:** a real browser, on a real deployment, against a real sheet, on your Google account.
 That is machine-specific by nature — it is one deployment on one account — and it is the last step of
 your setup for exactly that reason. If a sheet write does not happen on your first pass, the fault is
-almost always in steps 2 to 4 of section 5, and the fix is there rather than in the agents.
+almost always in steps 1 to 3 of section 6, and the fix is there rather than in the agents.
+
+**Also not tested, and worth saying:** the setup walkthrough in section 3 has not been run end to end
+against a live account. The agent side of it — creating a spreadsheet and writing a header into
+someone's Drive — is a capability of the product, not something this pack has exercised, and the
+script's own setup run has only ever been checked in a simulator. If the Scout cannot build the sheet,
+section 6's fallback is the same manual path every earlier version used.
 
 Nothing in this pack has sent a message, and nothing in it can.
 
 ---
 
-## 17. What this lets you do
+## 18. What this lets you do
 
 This is the section to read if you are deciding whether any of this is worth your time.
 
@@ -704,21 +826,38 @@ The blank page and the bookkeeping are what eat the day. This gives both back, s
 
 ### What you need
 
-A Google account, a target you can describe in one sentence, a LinkedIn account you actually use, and
-an agent product to create the agents in. About half an hour for the first run, end to end, of which
-the sheet itself is ten minutes. Section 16 is honest about how much of this has been run against a
-live sheet: read it before you plan an afternoon around it.
+A Google account with Drive connected to your agent, a target you can describe in one sentence, a
+LinkedIn account you actually use, and an agent product to create the agents in. About half an hour
+for the first run, end to end, of which the sheet itself is ten minutes. Section 17 is honest about
+how much of this has been run against a live sheet: read it before you plan an afternoon around it.
 
 ---
 
-## 18. Build on it
+## 19. What still needs a human, and cannot be automated
 
-Everything here — the dashboard, the sheet script, this document, the five READMEs — is meant to ship as a repository, so someone technical can pull it apart and make it theirs. Repository: `[REPO LINK]`. The link is filled in when the repository goes public; until then this section says what it will contain.
+Four things, permanently. None of them is a missing feature, and none is a gap in this pack.
+
+- **Deploying the Apps Script.** The agent can write the sheet and hand you the script. It cannot press
+  Deploy inside your Google account: Google owns that button, the deployment belongs to the account
+  owner, and no agent product changes that.
+- **Creating each agent.** Creating an agent is an approval, and on Genspark it is a card you tap. The
+  Scout prepares each one, with the exact name and the right README, and you press it — four times,
+  in chain order.
+- **Sending and accepting on LinkedIn.** No agent in this pack can send an invitation or a message, or
+  see who accepted one. Both are yours, by hand, from your own profile.
+- **Choosing the words.** The drafts are drafts. You pick the version, you change a line if you want
+  to, and yours is the name on the message.
+
+---
+
+## 20. Build on it
+
+Everything here — the dashboard, the sheet script, this document, the five READMEs — is meant to ship as a repository, so someone technical can pull it apart and make it theirs. Repository: https://github.com/marama03/godsleye-outreach — private while this pack is being shown, public once it is released.
 
 **What is in it**
 
 - The dashboard app — the screen you work from, including Today and the row cards.
-- The sheet script — the same file you paste in section 5, step 2.
+- The sheet script — the same file you paste in section 6, step 1.
 - This document and the five READMEs, so the reasoning travels with the code.
 - The demo script, so the build can be shown without reading all of the above first.
 
@@ -732,42 +871,42 @@ Everything here — the dashboard, the sheet script, this document, the five REA
 
 **What they must bring**
 
-- Their own Google account and their own copy of the sheet. The repo ships with no sheet, no token and no data in it.
+- Their own Google account and their own sheet — built by their own Scout, or copied from the template. The repo ships with no sheet, no token and no data in it.
 - Their own model subscription, or a hosted agent, for the five agents to run on.
 - Somewhere to run the dashboard: it talks to the sheet through its own server, so it is not a page you can drop on free static hosting. A laptop and a tunnel is enough to start.
 
-**Licence:** `[DECIDE: licence — chosen by whoever publishes this]`.
+**Licence:** MIT. Take it, change it, ship it, sell it — keep the copyright line and the licence text in anything you redistribute, and nothing else is asked of you. See the `LICENSE` file in the repository.
 
 **One rule worth keeping if you fork it.** The sheet stays the single source of state, and only one writer touches each column. Everything that makes this thing trustworthy — the ladder arithmetic, the repair path, the reason a stuck row stays visibly stuck — comes from that rule, not from the code around it.
 
 ---
 
-## 19. The files in this pack
+## 21. The files in this pack
 
 | File | What it is |
 |---|---|
-| `godsleye-start-here.md` | This document. Read once |
-| `agent-briefs/linkedin-prospect-scout.md` | LinkedIn Prospect Scout's README |
-| `agent-briefs/linkedin-outreach-tracker.md` | LinkedIn Outreach Tracker's README |
-| `agent-briefs/linkedin-intel-researcher.md` | LinkedIn Intel Researcher's README |
-| `agent-briefs/linkedin-strategy-prioritizer.md` | LinkedIn Strategy Prioritizer's README |
-| `agent-briefs/linkedin-outreach-copywriter.md` | LinkedIn Outreach Copywriter's README |
-| `godsleye-operator-flow.md` | The same setup as a checklist, for the second time through |
-| `godsleye-demo-script.md` | The six clicks, for showing this to someone |
-| `godsleye-Code.gs` | The sheet script, pasted in step 2 |
-| Template sheet | Header row in place, no data. Link in section 5 |
+| `godsleye-start-here-FINAL.md` | This document. Read once |
+| `agent-briefs/linkedin-prospect-scout-FINAL.md` | LinkedIn Prospect Scout's README |
+| `agent-briefs/linkedin-outreach-tracker-FINAL.md` | LinkedIn Outreach Tracker's README |
+| `agent-briefs/linkedin-intel-researcher-FINAL.md` | LinkedIn Intel Researcher's README |
+| `agent-briefs/linkedin-strategy-prioritizer-FINAL.md` | LinkedIn Strategy Prioritizer's README |
+| `agent-briefs/linkedin-outreach-copywriter-FINAL.md` | LinkedIn Outreach Copywriter's README |
+| `godsleye-operator-flow-FINAL.md` | The same setup as a checklist, for the second time through |
+| `godsleye-demo-script-FINAL.md` | The six clicks, for showing this to someone |
+| `godsleye-Code-FINAL.gs` | The sheet script, pasted in section 6, step 1 |
+| Template sheet, preview only | The shape, with the header row and the two tabs. Not copied. Link in section 2 |
 
 Each README is self-contained: an agent gets one file and needs nothing else from this pack. They are
 written in the same order every time — who you are, what your name must be, the chain, what you read,
 what you write, what you must ask, your first run, and how to fail — so that you can find the same
 thing in the same place in all five.
 
-One thing to check against your downloads. The script is one file, and it carried an earlier name
-before this pack settled on `godsleye-`. If you downloaded it under that earlier name, it is the same
-file — renamed only, contents unchanged. Nothing else in this pack was renamed at the same time.
+Every file here ends in `-FINAL`, and that is the whole naming rule: the file without it is an older
+draft, and the ones with it are the ones going out. If a name in this table does not match what you
+have, the `-FINAL` file is the current one. The script is still one file, and its contents did not
+change when the pack was named.
 
 ---
 
 Built by **Daniel Marama**
 [maramamarketing.com](https://www.maramamarketing.com) · [portfolio.maramamarketing.com](https://portfolio.maramamarketing.com) · [daniel@maramamarketing.com](mailto:daniel@maramamarketing.com)
-
