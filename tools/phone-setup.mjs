@@ -77,6 +77,13 @@ if (!js || js.BackendState !== "Running") {
   const url = (up.out.match(/https:\/\/login\.tailscale\.com\/\S+/) ?? [])[0];
   fail(5, url ? `Open this link and sign in, then re-run this command:\n${url}` : "Open the Tailscale app, sign in, then re-run this command.");
 }
+// ---- 3b. the usual reasons a private address "works at home but not away"
+const phones = Object.values(js.Peer ?? {}).filter((p) => /ios|android/i.test(p.OS ?? ""));
+const phonesOnline = phones.filter((p) => p.Online);
+if (js.CurrentTailnet && js.CurrentTailnet.MagicDNSEnabled === false)
+  fail(1, "Found the problem: MagicDNS is off for this tailnet, so the address has no name. Turn it on at https://login.tailscale.com/admin/dns, then re-run this.");
+if (!(js.CertDomains ?? []).length)
+  fail(1, "Found the problem: HTTPS certificates are not enabled for this tailnet. Without them the address resolves on your wifi but fails everywhere else. Turn on 'HTTPS Certificates' at https://login.tailscale.com/admin/dns, then re-run this.");
 const dns = (js.Self?.DNSName ?? "").replace(/\.$/, "");
 if (!dns) fail(1, "Tailscale is running but has no machine name yet. Enable MagicDNS and HTTPS in the Tailscale admin console (login.tailscale.com/admin/dns), then re-run.");
 
@@ -103,6 +110,28 @@ if (!ok) fail(1, `The address was created but did not answer yet: ${link}\nCheck
 
 say(`\nPrivate address is live and answering: ${link}`);
 say("Only devices signed in to this Tailscale account can open it.");
+// sleep check: a sleeping computer cannot answer
+let sleepNote = "";
+try {
+  if (isWin) {
+    const r = run("powercfg", ["/query", "SCHEME_CURRENT", "SUB_SLEEP", "STANDBYIDLE"]);
+    const m = r.out.match(/Current AC Power Setting Index:\s*0x([0-9a-f]+)/i);
+    if (m && parseInt(m[1], 16) > 0) sleepNote = `This computer goes to sleep after ${Math.round(parseInt(m[1], 16) / 60)} minutes on power, and the address stops answering while it sleeps. Set Sleep to Never in Settings > Power.`;
+  } else if (process.platform === "darwin") {
+    const r = run("pmset", ["-g"]);
+    const m = r.out.match(/^\s*sleep\s+(\d+)/m);
+    if (m && Number(m[1]) > 0) sleepNote = `This Mac sleeps after ${m[1]} minutes, and the address stops answering while it sleeps. Run: sudo pmset -c sleep 0`;
+  }
+} catch {}
+say("\nWhat I checked:");
+say("  [ok] MagicDNS is on and HTTPS certificates are enabled");
+say("  [ok] The address answers from this computer over the tailnet (kept alive with --bg, so closing this window does not stop it)");
+say(phonesOnline.length
+  ? `  [ok] A phone is connected to your tailnet right now (${phonesOnline.map((p) => p.HostName).join(", ")})`
+  : phones.length
+    ? "  [!!] No phone is connected right now. Open the Tailscale app on the phone and switch it ON; away from this wifi that tunnel is the only way in."
+    : "  [!!] No phone has joined this tailnet yet. Install Tailscale on the phone and sign in to the same account.");
+say(sleepNote ? `  [!!] ${sleepNote}` : "  [ok] This computer is not set to sleep while on power");
 say("\nFor the person (phone):");
 say("  1. Install the Tailscale app on the phone and sign in to the same account.");
 say("  2. Open the link above in Safari (iPhone) or Chrome (Android).");
